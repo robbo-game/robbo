@@ -53,7 +53,7 @@ async function main() {
         });
         await assertObjectSize();
         assert.equal(view.overflow, false, `${width}x${height}: no horizontal page overflow`);
-        assert.equal(view.width, width, 'Canvas must use all available width');
+        assert.equal(view.width, touch && width > height && height <= 600 ? width - 292 : width, 'Board uses available space between thumb controls');
         assert(view.height > height / 2, 'Most of the screen must be available for the board');
         assert(view.bottom <= view.playBottom, 'HUD and controls fit in the first screen');
         assert(Math.abs(view.width / view.tiles[0] - view.height / view.tiles[1]) < 0.01, 'Tiles must remain square');
@@ -61,7 +61,7 @@ async function main() {
         assert.deepEqual(await page.evaluate(() => window.robboTest.snapshot()), snapshot, 'Resizing must not alter the game or advance its clock');
         if (touch) {
           for (const box of await page.locator('.touch-controls button').evaluateAll(buttons => buttons.map(button => { const b = button.getBoundingClientRect(); return { x: b.x, y: b.y, width: b.width, height: b.height, bottom: b.bottom }; }))) {
-            assert(box.width >= 44 && box.height >= 44, 'Touch targets must be at least 44 CSS pixels');
+            assert(box.width >= 48 && box.height >= 48, 'Touch targets must be at least 48 CSS pixels');
             assert(box.x >= 0 && box.y >= 0 && box.bottom <= height, 'Touch controls must remain on screen');
           }
         }
@@ -72,10 +72,10 @@ async function main() {
       await page.locator('.viewport').evaluate(node => { node.style.flex = ''; node.style.height = ''; });
       await page.setViewportSize({ width: 915, height: 412 });
       await page.evaluate(() => window.robboTest.load(Array.from({ length: 31 }, (_, y) => (y === 1 ? '.R' : '..') + '.'.repeat(14))));
-      await page.waitForFunction(() => Number(document.getElementById('board').dataset.viewport.split(',')[0]) === 915 / 32);
+      await page.waitForFunction(expected => Number(document.getElementById('board').dataset.viewport.split(',')[0]) === expected / 32, touch ? 623 : 915);
       for (const [width, height] of [[320, 640], [915, 412], [1920, 1080]]) {
         await page.setViewportSize({ width, height });
-        await page.waitForFunction(width => document.getElementById('board').width === width * 2, width);
+        await page.waitForFunction(width => document.getElementById('board').width === width * 2, touch && width > height && height <= 600 ? width - 292 : width);
         await assertObjectSize();
         assert.deepEqual(await page.evaluate(() => window.robboTest.snapshot().robot), [1, 1], 'A narrow planet keeps its world coordinates');
       }
@@ -83,14 +83,14 @@ async function main() {
       // Headless fullscreen retains the OS display size; test container expansion as well.
       if (engine === chromium) {
         await page.addStyleTag({ content: 'html:not(:fullscreen) #play-area { width: 600px; }' });
-        await page.waitForFunction(() => document.getElementById('board').width === 1200);
+        await page.waitForFunction(expected => document.getElementById('board').width === expected, touch ? 616 : 1200);
         await page.locator('#fullscreen').click();
         await page.waitForFunction(() => !!document.fullscreenElement);
-        await page.waitForFunction(() => document.getElementById('board').width > 1200);
+        await page.waitForFunction(expected => document.getElementById('board').width > expected, touch ? 616 : 1200);
         await assertObjectSize();
         await page.locator('#fullscreen').click();
         await page.waitForFunction(() => !document.fullscreenElement);
-        await page.waitForFunction(() => document.getElementById('board').width === 1200);
+        await page.waitForFunction(expected => document.getElementById('board').width === expected, touch ? 616 : 1200);
         await assertObjectSize();
       }
       await page.locator('#settings').click();

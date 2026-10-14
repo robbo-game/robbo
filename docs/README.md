@@ -2,6 +2,7 @@
 
 - [Development, local play and validation](development.md)
 - [Contributing](../CONTRIBUTING.md)
+- [Mobile controls, gestures and design references](mobile-controls.md)
 - [Architecture and module boundaries](architecture.md)
 - [Campaign import and candidate requirements](campaign-import.md)
 - [Generated import diagnostics](import-diagnostics.md)

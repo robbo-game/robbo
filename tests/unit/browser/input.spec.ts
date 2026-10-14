@@ -1,3 +1,4 @@
+import { directionAt, PointerActions } from '../../../src/browser/input/touch-input';
 import { describe, expect, it } from 'vitest';
 import { ActionInput } from '../../../src/browser/input/action-input';
 describe('Shared cardinal input', () => {
@@ -22,5 +23,30 @@ describe('Shared cardinal input', () => {
     expect(input.gamepad({ axes: [.2, .1], buttons })).toEqual(['pause']); expect(input.command()).toBeUndefined();
     expect(input.gamepad({ axes: [.7, -.8], buttons })).toEqual(['up']); expect(input.command()?.direction).toBe(3);
     input.gamepad(null); expect(input.held.size).toBe(0);
+  });
+});
+
+// The pad is digital because Robbo moves on a grid, not on analogue diagonals.
+describe('Touch direction selection', () => {
+  it('selects cardinal directions and resolves diagonal ties consistently', () => {
+    expect(directionAt(78, 0, 156)).toBe('up');
+    expect(directionAt(0, 78, 156)).toBe('left');
+    expect(directionAt(156, 78, 156)).toBe('right');
+    expect(directionAt(78, 156, 156)).toBe('down');
+    expect(directionAt(140, 140, 156)).toBe('right');
+  });
+  it('stops in the centre or outside the pad', () => {
+    for (const [x, y] of [[78, 78], [90, 80], [-1, 78], [157, 78], [78, -1], [78, 157]]) {
+      expect(directionAt(x, y, 156)).toBeUndefined();
+    }
+  });
+  it('releases one pointer without releasing the other thumb', () => {
+    const input = new ActionInput(), pointers = new PointerActions(input);
+    pointers.press(1, 'fire'); pointers.press(2, 'right');
+    pointers.release(1);
+    expect(input.command()).toEqual({ direction: 0, fire: false });
+    pointers.press(2, 'up');
+    expect(input.command()).toEqual({ direction: 3, fire: false });
+    pointers.reset(); expect(input.command()).toBeUndefined();
   });
 });

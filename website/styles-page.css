@@ -65,13 +65,37 @@ html[data-artwork="modern"] .digit { background: none; color: #e4e8de; font: 800
 details { border-top: 1px solid #364330; padding-top: 14px; font-size: 13px; line-height: 1.7; color: #b7c3af; }summary { cursor: pointer; color: #d6e2cb; }footer { margin-top: 28px; color: #75836b; font-size: 11px; }
 @media (max-width: 600px), (max-height: 500px) { .intro, .hud .icon, .hud small { display: none; }.hud-label { margin: 0; }.toolbar button { padding: 6px; font-size: 12px; flex: 1; } }
 
-/* Native controls remain reachable by touch, keyboard and assistive technology. */
-.touch-controls { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; padding: 4px; }
-.touch-controls button { min-width: 0; min-height: 44px; padding: 4px; touch-action: none; user-select: none; }
-.touch-controls button[aria-pressed="true"] { background: #c85b12; color: white; }
+/* A dedicated thumb area keeps fingers off the board. */
+.touch-controls { display: flex; flex: none; justify-content: space-between; align-items: center; padding: 10px 20px 14px; background: #111a12; border-top: 1px solid #364330; }
+html[data-touch-fire-side="left"] .touch-controls { flex-direction: row-reverse; }
+.touch-dpad { display: grid; grid-template: repeat(3, 52px) / repeat(3, 52px); border-radius: 50%; background: #1c291c; touch-action: none; }
+.touch-controls button { min-width: 48px; min-height: 48px; padding: 0; touch-action: none; user-select: none; -webkit-user-select: none; font-size: 26px; border-radius: 14px; }
+.touch-dpad [data-action="up"] { grid-area: 1 / 2; }
+.touch-dpad [data-action="left"] { grid-area: 2 / 1; }
+.touch-dpad [data-action="right"] { grid-area: 2 / 3; }
+.touch-dpad [data-action="down"] { grid-area: 3 / 2; }
+.touch-controls [data-action="fire"] { width: 88px; height: 88px; border-radius: 50%; background: #caff45; color: #18210b; border: 3px solid #e0ff9a; box-shadow: 0 5px 0 #57741c; font-size: 36px; line-height: 1; }
+.touch-controls [data-action="fire"] span { display: block; font-size: 12px; font-weight: 800; margin-top: 4px; letter-spacing: .1em; }
+.touch-controls button[aria-pressed="true"] { background: #f4ffd8; color: #18210b; box-shadow: inset 0 0 0 3px #9dcf31; }
 .touch-controls p { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
-@media (max-width: 600px) { .touch-controls { grid-template-columns: repeat(5, minmax(0, 1fr)); }.touch-controls button:nth-of-type(6) { grid-column: span 2; }.touch-controls button:nth-of-type(7) { grid-column: span 3; } }
-@media (hover: hover) and (pointer: fine) { .touch-controls { display: none; } }
+@media (hover: hover) and (pointer: fine) { .touch-controls, #touch-restart { display: none; } }
+@media (pointer: coarse) {
+  .toolbar button { min-height: 48px; }
+  .toolbar #start { display: none; }
+  .toolbar #restart { display: none; }
+  .hud { padding: 4px 12px; }
+}
+/* Landscape puts the thumbs beside the board instead of covering its tiles. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .game { position: relative; padding: 0 116px 0 176px; }
+  .touch-controls { position: absolute; inset: 0; padding: 0; background: transparent; border: 0; pointer-events: none; }
+  .touch-dpad { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+  .touch-controls [data-action="fire"] { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
+  .touch-controls button { pointer-events: auto; }
+  html[data-touch-fire-side="left"] .game { padding-left: 116px; padding-right: 176px; }
+  html[data-touch-fire-side="left"] .touch-dpad { left: auto; right: 10px; }
+  html[data-touch-fire-side="left"] .touch-controls [data-action="fire"] { right: auto; left: 14px; }
+}
 
 .input-settings label { display: inline-block; margin: .5rem; }
 .input-settings input[readonly] { width: 7rem; padding: .5rem; }
