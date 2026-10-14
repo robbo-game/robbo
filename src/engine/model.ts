@@ -31,7 +31,12 @@ export const symbolKinds: Record<string, Kind> = {
   s: 'wall', '-': 'wall', O: 'wall', o: 'wall', S: 'wall', p: 'wall', P: 'wall', Q: 'wall', q: 'wall', '+': 'wall'
 };
 export const kindSymbols: Partial<Record<Kind, string>> = Object.fromEntries(Object.entries(symbolKinds).map(([s, k]) => [k, s]));
-export function seededRandom(seed: number): () => number {
-  let value = seed >>> 0;
-  return () => { value = (Math.imul(value, 1664525) + 1013904223) >>> 0; return value / 4294967296; };
+export interface SeededRandom { (): number; state: number }
+export function seededRandom(seed: number): SeededRandom {
+  const random: SeededRandom = () => {
+    random.state = (Math.imul(random.state, 1664525) + 1013904223) >>> 0;
+    return random.state / 4294967296;
+  };
+  random.state = seed >>> 0;
+  return random;
 }

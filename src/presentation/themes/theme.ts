@@ -9,7 +9,7 @@ export interface ThemeManifest {
 }
 /** Fixed frame coordinates remain defined by sprite-frames.ts; alternate atlases must share this layout. */
 export const javaTheme: ThemeManifest = {
-  id: 'java-atlas-v1', name: 'Java reference', author: 'Historical Robbo project',
+  id: 'java-atlas-v1', name: 'Original Legacy', author: 'Historical Robbo project',
   about: 'Original Java atlas and HUD digits; historical resources preserved without substitution.',
   atlas: { path: 'legacy-icons32.png', width: 410, height: 274, cell: 32, stride: 34, inset: 2 },
   digits: { path: 'numbers.png', width: 178, height: 32, cell: 16, stride: 18 },

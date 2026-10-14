@@ -1,3 +1,4 @@
+import { readWorldState, type WorldState } from './world-state';
 import { requireSupportedSymbols } from './level-symbols';
 import { inverse, kindSymbols, symbolKinds, vectors } from './model';
 import type { Command, Direction, Entity, GameEvent, Kind, LevelData, SoundName } from './model';
@@ -446,6 +447,33 @@ export class GameWorld {
       }
       m.e.x = m.x; m.e.y = m.y; this.grid[m.y * this.level.width + m.x] = m.e;
     }
+  }
+
+  /** Detached simulation checkpoint; pending input and already-delivered audio are excluded. */
+  snapshot(): WorldState {
+    return { tick: this.tick, remaining: this.remaining, collected: this.collected,
+      keys: this.keys, ammo: this.ammo, status: this.status, statusTicks: this.statusTicks,
+      teleportTicks: this.teleportTicks, magnetOwner: this.magnetOwner,
+      deathPresentationPending: this.deathPresentationPending, nextId: this.nextId,
+      robot: { ...this.robot }, entities: [...this.entities.values()].map(e => ({ ...e })),
+      blasts: this.blasts.map(b => ({ ...b })),
+      lasers: this.lasers.map(l => ({ ...l, owner: { ...l.owner }, parts: l.parts.map(part => ({ ...part })) })) };
+  }
+
+  restore(raw: unknown): void {
+    const data = readWorldState(raw, this.level);
+    this.grid.fill(undefined); this.entities.clear();
+    for (const e of data.entities) { this.entities.set(e.id, e); this.grid[e.y * this.level.width + e.x] = e; }
+    this.robot = this.entities.get(data.robot.id) ?? data.robot;
+    this.tick = data.tick; this.remaining = data.remaining; this.collected = data.collected;
+    this.keys = data.keys; this.ammo = data.ammo; this.status = data.status; this.statusTicks = data.statusTicks;
+    this.teleportTicks = data.teleportTicks; this.magnetOwner = data.magnetOwner;
+    this.deathPresentationPending = data.deathPresentationPending; this.nextId = data.nextId;
+    this.blasts.splice(0, this.blasts.length, ...data.blasts);
+    this.lasers.splice(0, this.lasers.length, ...data.lasers.map(l => ({ ...l, direction: l.direction as Direction,
+      owner: this.entities.get(l.owner.id) ?? l.owner,
+      parts: l.parts.map(part => this.entities.get(part.id) ?? part) })));
+    this.events.length = 0; this.clearInput(); this.assertConsistent();
   }
 
   /** Used by data validation and deterministic tests, never by rendering. */

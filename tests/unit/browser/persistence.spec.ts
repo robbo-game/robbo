@@ -5,6 +5,12 @@ import { CampaignStore } from '../../../src/browser/persistence/campaign-store';
 import { packs } from '../../../src/generated/packs';
 function memory(): SafeStorage { const values = new Map<string, string>(); return { getItem: k => values.get(k) ?? null, setItem: (k, v) => { values.set(k, v); }, removeItem: k => { values.delete(k); } }; }
 describe('Campaign checkpoints', () => {
+  it('defaults to Original Legacy and preserves a previously chosen campaign', () => {
+    const storage = memory(), store = new CampaignStore(packs, storage);
+    expect(store.active).toBe('01'); store.select('02', 3);
+    expect(new CampaignStore(packs, storage).active).toBe('02');
+    store.reset(); expect(store.active).toBe('01');
+  });
   it('separates inspection, earned progress, completion and reset across campaigns', () => {
     const storage = memory(), store = new CampaignStore(packs, storage);
     store.select('02', 56); expect(store.get('02').reached).toBe(1);
@@ -16,7 +22,7 @@ describe('Campaign checkpoints', () => {
   });
   it('falls back on malformed/denied storage and clamps shortened campaigns', () => {
     const storage = memory(); storage.setItem('robbo.progress.v1', '{');
-    expect(new CampaignStore(packs, storage).active).toBe('02');
+    expect(new CampaignStore(packs, storage).active).toBe('01');
     const denied: SafeStorage = { getItem() { throw Error(); }, setItem() { throw Error(); }, removeItem() { throw Error(); } };
     expect(() => new CampaignStore(packs, denied).advance('02', 2, false)).not.toThrow();
     storage.setItem('robbo.progress.v1', JSON.stringify({ version: 1, active: 'missing', campaigns: { '02': { selected: 99, reached: 99, completed: true } } }));

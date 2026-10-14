@@ -36,6 +36,7 @@ npm run test:browser
 npm run test:input
 npm run test:touch-shooting
 npm run test:session-browser
+npm run test:autosave
 npm run test:viewport
 npm run test:artwork
 npm run test:performance
@@ -74,3 +75,44 @@ Recordings from `robbo-java-1` are rejected at import because their movement and
 death checkpoints can differ. Keep an old build to view those recordings; record
 new runs with the current build. Changing the engine field in an old recording
 is not a valid migration. Campaign progress and preference storage are unchanged.
+
+## Continuing a saved game
+
+New profiles start with campaign **Original Legacy** (`01`) and its classic
+artwork. Explicitly saved campaign and artwork choices are retained.
+
+The current attempt is saved automatically in IndexedDB (`robbo-saves`, object
+store `attempts`, key `current`) after each simulation tick or session change.
+Loading finishes before input and the game clock are enabled. The saved attempt
+opens paused; choose **Resume** to continue. Held touch/keyboard input and old
+sound events are discarded. No offline time is simulated.
+
+The checkpoint contains the campaign, planet, seed and current RNG state,
+inventory, every entity and its timers, active lasers and bomb waves, teleport
+materialization and death/win lifecycle counters. Laser owners and parts are
+reconnected to the restored entity identities. Campaign data hashes and the
+shared replay engine version reject incompatible records; invalid records fall
+back to the selected planet instead of partially loading.
+
+A synchronous `localStorage` journal (`robbo.attempt.backup.v1`) protects the
+latest checkpoint on blur, visibility loss and pagehide, when an asynchronous
+write might not finish. If IndexedDB is unavailable, the journal is the fallback
+store. On startup the newest valid record wins. Replay imports and `#test`
+fixtures cannot replace the player's save. New game, Restart and Reset saved
+progress replace the checkpoint with the new attempt.
+
+The save belongs to this browser profile and origin. Clearing site data removes
+it; private-mode data is temporary. Another device or browser has its own save.
+Storage failure is shown in Settings. A sudden OS/process crash can interrupt
+an in-flight write; continuous checkpoints limit the loss to recent ticks.
+
+`npm run test:autosave` launches a browser with a temporary persistent profile,
+collects ammunition on planet 20, closes the browser process and reopens it.
+It compares the full checkpoint, checks paused restoration and Resume, then
+checks reset and a blocked-IndexedDB fallback. CI runs it in Chromium and Firefox.
+Simulation tests also compare continued state and RNG through lasers, shooting
+birds, bomb chains, teleportation and the death lifecycle.
+
+References: [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
+provides asynchronous structured storage; [visibilitychange](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event)
+is the lifecycle checkpoint used when a mobile page becomes hidden.

@@ -1,4 +1,4 @@
-import type { Direction, Pack } from '../engine/model';
+import type { Direction, Pack, SeededRandom } from '../engine/model';
 import { seededRandom } from '../engine/model';
 import { GameWorld } from '../engine/game-world';
 
@@ -10,12 +10,16 @@ export class GameSession {
   started = false;
   generation = 0;
   private planetIndex = 0;
+  private random!: SeededRandom;
+  get randomState(): number { return this.random.state; }
+  restoreRandomState(state: number): void { this.random.state = state >>> 0; }
   constructor(public pack: Pack, private seed = Date.now()) { this.load(0); }
   get initialSeed(): number { return this.seed >>> 0; }
   get planet(): number { return this.planetIndex + 1; }
   private load(index: number): void {
     this.planetIndex = index; this.completed = false; this.generation++;
-    this.world = new GameWorld(this.pack.levels[index], seededRandom(this.seed + index));
+    this.random = seededRandom(this.seed + index);
+    this.world = new GameWorld(this.pack.levels[index], this.random);
     this.world.emit('capsule');
   }
   start(): void { this.started = true; this.paused = false; this.world.clearInput(); }
