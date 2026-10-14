@@ -56,11 +56,22 @@ export function startGame(): void {
   const renderer = createBoardRenderer(canvas, camera, () => artwork);
   const audio = new GameAudio(message => { element('audio-status').textContent = message; });
   const preferences = new PreferenceStore();
+  const touchFireSide = element<HTMLSelectElement>('touch-fire-side');
+  function syncTouchLayout(): void {
+    touchFireSide.value = preferences.current.touchFireSide;
+    document.documentElement.dataset.touchFireSide = preferences.current.touchFireSide;
+  }
+  syncTouchLayout();
+  touchFireSide.addEventListener('change', () => {
+    clearInput();
+    preferences.apply({ touchFireSide: touchFireSide.value === 'left' ? 'left' : 'right' });
+    syncTouchLayout();
+  });
   audio.setMuted(preferences.current.muted); audio.setVolume(preferences.current.volume);
   element<HTMLInputElement>('mute').checked = preferences.current.muted;
   element<HTMLInputElement>('volume').value = String(preferences.current.volume * 100);
   const resetPreferences = document.createElement('button'); resetPreferences.textContent = text('preferences.reset');
-  resetPreferences.addEventListener('click', () => { const value = preferences.reset(); audio.setMuted(value.muted); audio.setVolume(value.volume); element<HTMLInputElement>('mute').checked = value.muted; element<HTMLInputElement>('volume').value = String(value.volume * 100); });
+  resetPreferences.addEventListener('click', () => { const value = preferences.reset(); clearInput(); syncTouchLayout(); audio.setMuted(value.muted); audio.setVolume(value.volume); element<HTMLInputElement>('mute').checked = value.muted; element<HTMLInputElement>('volume').value = String(value.volume * 100); });
   element('enable-sound').parentElement!.append(resetPreferences);
   const input = new ActionInput();
   let touchControls: ReturnType<typeof attachTouch> | undefined;

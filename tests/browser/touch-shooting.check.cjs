@@ -5,10 +5,14 @@ const { chromium } = require('playwright');
 (async () => {
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   try {
-    for (const viewport of [{ width: 390, height: 760 }, { width: 844, height: 390 }]) {
+    for (const side of ['right', 'left']) for (const viewport of [{ width: 390, height: 760 }, { width: 844, height: 390 }]) {
       const context = await browser.newContext({ viewport, hasTouch: true });
       const page = await context.newPage();
       await page.goto(pathToFileURL(path.resolve('release/robbo/index.html')).href + '#test');
+      await page.selectOption('#touch-fire-side', side);
+      await page.reload();
+      assert.equal(await page.locator('#touch-fire-side').inputValue(), side, 'Layout survives reload');
+      await page.locator('#back-to-game').click();
       const cdp = await context.newCDPSession(page);
       const point = async (action, id) => {
         const box = await page.locator(`[data-action="${action}"]`).boundingBox();
@@ -20,6 +24,8 @@ const { chromium } = require('playwright');
         window.robboTest.inventory(9);
       });
       const fire = await point('fire', 1);
+      const padCentre = await point('up', 2);
+      assert.equal(fire.x < padCentre.x, side === 'left', 'Fire and movement swap sides');
       for (const [action, direction] of [['right', 0], ['down', 1], ['left', 2], ['up', 3]]) {
         await load();
         const aim = await point(action, 2);
@@ -60,6 +66,6 @@ const { chromium } = require('playwright');
       assert.deepEqual((await page.evaluate(() => window.robboTest.snapshot())).robot, [4, 3]);
       await context.close();
     }
-    console.log('Touch shooting passed in portrait and landscape: all four projectile directions, stationary aim, slide to retarget, both release orders and cancellation.');
+    console.log('Touch shooting passed in both saved thumb layouts, portrait and landscape: all four projectile directions, stationary aim, slide to retarget, both release orders and cancellation.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

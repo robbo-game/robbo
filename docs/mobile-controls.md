@@ -2,7 +2,10 @@
 
 Robbo moves on a four-direction grid. A fixed D-pad under the left thumb and a
 separate momentary fire button under the right thumb replace the old row of
-labelled buttons. Hold a direction to repeat movement, or slide the same finger
+labelled buttons. Settings → Touch layout lets players swap the two controls,
+putting Fire under either thumb. The choice persists in the existing preferences
+record; old records default to Fire on the right. Reset preferences restores that
+default. Changing sides clears held inputs. Hold a direction to repeat movement, or slide the same finger
 to turn. The centre and the area outside the pad release movement. Hold Fire
 and aim to shoot; releasing Fire resumes movement. To stop shooting without moving, release the direction
 first. Fire alone neither fires nor selects a direction. There are no diagonal moves.
@@ -23,6 +26,10 @@ to Settings on touch devices. Native button keyboard activation remains availabl
 The numbered callouts in this screenshot explain the gesture and are not part of
 the game interface.
 
+![Fire on the left in landscape](images/mobile-landscape-left-fire.png)
+
+![Fire on the left in portrait](images/mobile-portrait-left-fire.png)
+
 ## Design references
 
 - [Apple: Game controls](https://developer.apple.com/design/human-interface-guidelines/game-controls)
@@ -40,7 +47,7 @@ comfort across hand sizes and browser gesture areas.
 Run `npm run package`, `npm test`, `node tests/browser/input.check.cjs`,
 `node tests/browser/viewport.check.cjs`, `node tests/browser/touch-shooting.check.cjs` and `node tests/browser/session.check.cjs`.
 Input coverage includes native two-finger fire, cancellation, sliding direction
-changes, the neutral centre, release, keyboard and gamepad regressions. Viewport
+changes, the neutral centre, both saved thumb layouts, release, keyboard and gamepad regressions. Viewport
 coverage checks portrait, landscape, desktop, fullscreen, target sizes and camera
 visibility without changing simulation state.
 
