@@ -103,7 +103,7 @@ async function main() {
     assert.equal(await page.locator('#milestone-notice').getAttribute('data-reduced'), 'true');
     assert.equal(await page.evaluate(() => window.mediaResults.length), mutedBefore);
     await capture('reduced-motion');
-    await click('Preview take-off'); await click('Restart planet'); await step(1);
+    await click('Preview take-off'); await click('Reset planet'); await step(1);
     assert.equal(await page.locator('#board').getAttribute('data-effect'), 'arrival');
     await page.locator('#mute').uncheck(); await page.locator('#volume').fill('20');
     await page.emulateMedia({ reducedMotion: 'no-preference' });

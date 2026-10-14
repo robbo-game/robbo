@@ -89,6 +89,17 @@ const { chromium } = require('playwright');
       await page.keyboard.press('p'); await page.keyboard.press('d'); await page.evaluate(() => window.robboTest.step());
       assert.deepEqual((await page.evaluate(() => window.robboTest.snapshot())).robot, [3, 1]);
     }
+    await page.evaluate(() => window.robboTest.planet(6));
+    const fresh = await page.evaluate(() => window.robboTest.snapshot());
+    await page.evaluate(() => window.robboTest.inventory(8, 2));
+    await page.locator('#pause').click();
+    await page.locator('#restart').click();
+    assert.equal(await page.locator('#board').getAttribute('data-tick'), '0', 'Reset starts immediately even while paused');
+    assert.equal(await page.locator('#keys').getAttribute('data-value'), '0');
+    const reset = await page.evaluate(() => window.robboTest.snapshot());
+    assert.equal(reset.planet, fresh.planet, 'Reset must restart the current planet');
+    assert.deepEqual(reset.robot, fresh.robot, 'Reset restores the starting position');
+    assert.equal(reset.ammo, 0); assert.equal(reset.remaining, fresh.remaining); assert.equal(reset.status, 'playing');
     assert.deepEqual(errors, []);
     console.log('Input browser smoke passed: native multitouch fire, cancellation, accessible activation, remapping, gamepad cardinal input and pause.');
   } finally { await browser.close(); }

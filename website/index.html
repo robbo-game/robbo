@@ -11,7 +11,7 @@
   <main>
     <div id="play-area">
     <div class="toolbar">
-      <button id="start" data-text="ui.start.game">Start game</button><button id="restart" data-text="ui.restart.planet">Restart planet</button><button id="pause" data-text="ui.pause"><span data-text="ui.pause.label">Pause</span></button><button id="fullscreen" data-text="ui.fullscreen">Fullscreen</button>
+      <button id="start" data-text="ui.start.game">Start game</button><button id="restart" data-text="ui.restart.planet">Reset planet</button><button id="pause" data-text="ui.pause"><span data-text="ui.pause.label">Pause</span></button><button id="fullscreen" data-text="ui.fullscreen">Fullscreen</button>
       <button id="settings">Settings</button>
     </div>
     <p id="display-status" role="status"></p>
@@ -22,17 +22,16 @@
         <div id="overlay"><h2 id="state-title">Ready, Robbo?</h2><p id="state-description">Collect every required screw, then enter the flashing ship.</p><button id="continue" data-text="ui.start.game">Start game</button></div>
       </div>
       <div class="hud" aria-label="Inventory" data-label="label.inventory" aria-live="off">
-        <div><span class="icon screw-icon" aria-hidden="true"></span><div><span class="hud-label" data-text="ui.screws.left">Screws left</span><span id="remaining" class="digits"></span><small><span id="collected">0</span><span data-text="ui.collected.suffix"> collected</span></small></div></div>
-        <div><span class="icon key-icon" aria-hidden="true"></span><div><span class="hud-label" data-text="ui.keys">Keys</span><span id="keys" class="digits"></span></div></div>
-        <div><span class="icon ammo-icon" aria-hidden="true"></span><div><span class="hud-label" data-text="ui.ammo">Ammo</span><span id="ammo" class="digits"></span></div></div>
-        <div><span class="icon planet-icon" aria-hidden="true"></span><div><span class="hud-label" data-text="ui.planet">Planet</span><span id="planet-number" class="digits"></span><small id="campaign-total" data-text="ui.of.56">of 56</small></div></div>
+        <div role="group" aria-labelledby="remaining-label"><span class="icon screw-icon" aria-hidden="true"></span><div><span id="remaining-label" class="hud-label" data-text="ui.screws.left">Screws left</span><span id="remaining" class="digits"></span><small><span id="collected">0</span><span data-text="ui.collected.suffix"> collected</span></small></div></div>
+        <div role="group" aria-labelledby="keys-label"><span class="icon key-icon" aria-hidden="true"></span><div><span id="keys-label" class="hud-label" data-text="ui.keys">Keys</span><span id="keys" class="digits"></span></div></div>
+        <div role="group" aria-labelledby="ammo-label"><span class="icon ammo-icon" aria-hidden="true"></span><div><span id="ammo-label" class="hud-label" data-text="ui.ammo">Ammo</span><span id="ammo" class="digits"></span></div></div>
+        <div role="group" aria-labelledby="planet-number-label"><span class="icon planet-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path d="M6 2h4v1h2v1h1v2h1v4h-1v2h-1v1h-2v1H6v-1H4v-1H3v-2H2V6h1V4h1V3h2Z" fill="currentColor"/><path d="M7 3h3v2H8v2H5V5h2Zm3 5h3v2h-2v3H9v-3h1Z" fill="#080b08"/><path d="M1 11v2h4m6-10h4v2" fill="none" stroke="currentColor"/></svg></span><div><span id="planet-number-label" class="hud-label" data-text="ui.planet">Planet</span><span id="planet-number" class="digits"></span><small id="campaign-total" data-text="ui.of.56">of 56</small></div></div>
       </div>
     </section>
     </div>
     <section id="game-settings" aria-label="Game settings">
     <header><div><p id="campaign-intro" class="eyebrow" data-text="ui.a.journey.through.56.planets">A journey through 56 planets</p><h1 data-text="ui.robbo">ROBBO</h1></div><p class="intro"><span data-text="ui.intro">Find the screws. Reach the ship.</span><br><span data-text="ui.watch.your.step">Watch your step.</span></p></header>
     <button id="back-to-game">Back to game</button>
-    <button id="touch-restart" type="button">Restart planet</button>
     <label>Touch layout <select id="touch-fire-side"><option value="right">FIRE right · movement left</option><option value="left">FIRE left · movement right</option></select></label>
     <p>Touch: slide or hold the D-pad to move. To shoot, hold FIRE with one thumb, then choose a direction with your other thumb. Slide to change aim. Release the direction first to stop in place; releasing FIRE first resumes movement.</p>
     <div class="campaign-settings">

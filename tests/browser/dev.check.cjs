@@ -41,7 +41,7 @@ async function main() {
     assert.equal(await page.locator('#state-title').textContent(), 'Paused');
     await page.selectOption('#theme', 'planet-journey-4');
     await page.waitForFunction(() => document.documentElement.dataset.theme === 'planet-journey-4');
-    assert.equal(await page.locator('.hud .icon canvas').count(), 4);
+    assert.equal(await page.locator('.hud .icon canvas').count(), 3);
     assert.deepEqual(errors, []);
     console.log('Vite dev passed: entrypoint outside website root, gameplay, pause and imported artwork.');
   } finally {

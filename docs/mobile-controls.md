@@ -18,8 +18,8 @@ Directions use 32 px SVG icons and Fire uses a 40 px crosshair, avoiding font
 fallback and baseline differences on Android. Both thumb zones are centred in
 equal-width portrait columns. Raised borders and an inset pressed state make
 touch feedback visible without shifting the controls. Pressed directions and
-Fire show immediate visual feedback. Pause stays in the top bar; Restart moves
-to Settings on touch devices. Native button keyboard activation remains available.
+Fire show immediate visual feedback. Pause and Reset planet stay in the top bar on touch devices. Reset immediately
+restarts the current planet and clears its inventory, including while paused. Native button keyboard activation remains available.
 
 ![Portrait controls](images/mobile-portrait.png)
 
@@ -57,3 +57,15 @@ visibility without changing simulation state.
 
 After packaging, `node scripts/dev/capture-mobile.cjs` writes reproducible Chromium
 screenshots to `artifacts/`. These are browser emulations, not physical phone captures.
+
+## Original inventory strip
+
+The [original Atari screenshots](https://www.atarimania.com/games/atari-400-800-xl-xe-games-robbo-4396)
+show small item pictograms beside numbers, rather than written item names. The
+web HUD follows that pattern for screws remaining, keys, ammo and the planet
+number. Classic item markers come from the existing legacy atlas; a yellow
+pixel globe marks the planet. Alternate themes use their own pickup artwork.
+Names and extra collected/total information remain available to screen readers.
+All four icons stay visible in portrait and landscape, including narrow phones.
+
+![Icon-only inventory strip](images/mobile-hud-detail.png)

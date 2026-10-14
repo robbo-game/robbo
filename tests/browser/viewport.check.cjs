@@ -52,6 +52,7 @@ async function main() {
           return { width: bounds.width, height: bounds.height, bottom: bounds.bottom, playBottom: play.bottom, overflow: document.documentElement.scrollWidth > innerWidth, camera: board.dataset.camera.split(',').map(Number), tiles: board.dataset.viewport.split(',').map(Number) };
         });
         await assertObjectSize();
+        for (const icon of await page.locator('.hud .icon').all()) assert(await icon.isVisible(), 'Inventory pictograms stay visible on every screen size');
         assert.equal(view.overflow, false, `${width}x${height}: no horizontal page overflow`);
         assert.equal(view.width, touch && width > height && height <= 600 ? width - 292 : width, 'Board uses available space between thumb controls');
         assert(view.height > height / 2, 'Most of the screen must be available for the board');
@@ -60,6 +61,8 @@ async function main() {
         for (const axis of [0, 1]) assert(79 >= view.camera[axis] && 80 <= view.camera[axis] + view.tiles[axis], 'Robot remains fully visible after resize');
         assert.deepEqual(await page.evaluate(() => window.robboTest.snapshot()), snapshot, 'Resizing must not alter the game or advance its clock');
         if (touch) {
+          const reset = await page.locator('#restart').boundingBox();
+          assert(reset && reset.width >= 48 && reset.height >= 48 && reset.y >= 0 && reset.y + reset.height <= height, 'Planet reset stays reachable in the top toolbar');
           for (const box of await page.locator('.touch-controls button').evaluateAll(buttons => buttons.map(button => { const b = button.getBoundingClientRect(); return { x: b.x, y: b.y, width: b.width, height: b.height, bottom: b.bottom }; }))) {
             assert(box.width >= 48 && box.height >= 48, 'Touch targets must be at least 48 CSS pixels');
             assert(box.x >= 0 && box.y >= 0 && box.bottom <= height, 'Touch controls must remain on screen');

@@ -252,7 +252,11 @@ export async function startGame(): Promise<void> {
   document.querySelector('.campaign-settings')!.append(resetProgress);
   element('continue').addEventListener('click', startOrContinue);
   element('start').addEventListener('click', () => { if (session.started) { replay.cancel(); session.newCampaign(); } else { session.start(); effects.arrive(session.world); } render(); activateAudio(); canvas.focus({ preventScroll: true }); });
-  element('restart').addEventListener('click', () => { retryWithPresentation(); render(); activateAudio(); canvas.focus({ preventScroll: true }); });
+  element('restart').addEventListener('click', () => {
+    if (replay.viewing) replay.cancel();
+    replayAction({ type: 'restart' }); clearInput(); render(); activateAudio();
+    canvas.focus({ preventScroll: true });
+  });
   element('pause').addEventListener('click', () => { pauseOrResume(); canvas.focus({ preventScroll: true }); });
   element<HTMLSelectElement>('pack').addEventListener('change', event => { replay.cancel(); session.newCampaign(packs.find(p => p.id === (event.target as HTMLSelectElement).value)); render(); });
   element<HTMLSelectElement>('planet').addEventListener('change', event => { replay.cancel(); session.selectPlanet(Number((event.target as HTMLSelectElement).value)); render(); });

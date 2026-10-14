@@ -57,11 +57,12 @@ export function createThemeController(canvas: HTMLCanvasElement, themeSelector: 
     render();
   }
   function updateInventoryArtwork(): void {
-    const journey = activeTheme.id.startsWith('planet-journey-');
+    const illustrated = activeTheme.id !== javaTheme.id;
     const cells = [[4, 0], [7, 0], [5, 0], [6, 1]];
     document.querySelectorAll<HTMLElement>('.hud .icon').forEach((icon, index) => {
+      if (index === 3) return; // The planet marker identifies a number, not a ship pickup.
       icon.replaceChildren(); icon.style.removeProperty('background');
-      if (!journey || !atlas) return;
+      if (!illustrated || !atlas) return;
       const preview = document.createElement('canvas'); preview.width = preview.height = 128;
       preview.setAttribute('aria-hidden', 'true');
       const p = preview.getContext('2d')!, a = activeTheme.atlas, [x, y] = cells[index];
