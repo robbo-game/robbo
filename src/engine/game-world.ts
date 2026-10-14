@@ -297,7 +297,7 @@ export class GameWorld {
     if (!this.robot.alive || this.teleportTicks) return;
     for (const d of [0, 1, 2, 3] as Direction[]) {
       const target = this.at(...this.next(this.robot, d));
-      if (target && ['bear', 'worm', 'eyes'].includes(target.kind)) { this.killRobot(); return; }
+      if (target && ['bird', 'bear', 'worm', 'eyes'].includes(target.kind)) { this.killRobot(); return; }
     }
   }
   private updateMomentum(e: Entity): void {
