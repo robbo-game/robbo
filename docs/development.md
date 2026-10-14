@@ -63,3 +63,14 @@ optionally selects a Chromium executable.
 | `archive` | Unused assets retained outside the release |
 | `tests` | Unit, integration, browser and tooling checks |
 | `scripts` | Data import, release and development tools |
+
+## Replay compatibility
+
+Engine `robbo-java-2` corrects bird contact: cardinal adjacency is lethal,
+including when either Robbo or a bird moves into a neighbouring cell. Diagonals
+do not count. The existing teleport materialization grace period is unchanged.
+
+Recordings from `robbo-java-1` are rejected at import because their movement and
+death checkpoints can differ. Keep an old build to view those recordings; record
+new runs with the current build. Changing the engine field in an old recording
+is not a valid migration. Campaign progress and preference storage are unchanged.

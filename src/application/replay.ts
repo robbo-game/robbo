@@ -1,6 +1,7 @@
 import { GameSession } from './game-session';
 import type { Direction, Pack } from '../engine/model';
-export const REPLAY_ENGINE = 'robbo-java-1';
+// Bird adjacency changes simulation outcomes; reject recordings of the old engine.
+export const REPLAY_ENGINE = 'robbo-java-2';
 const MAX_FRAMES = 100000, MAX_ACTIONS = 32;
 export type ReplayAction = { type: 'command'; direction: Direction; fire: boolean } | { type: 'pause' | 'restart' | 'retry' | 'start' };
 interface Frame { tick: number; actions: ReplayAction[]; checkpoint: string; events: string }

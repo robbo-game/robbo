@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { GameSession } from '../../src/application/game-session';
 import { ReplayRecorder, playReplay, checkpoint } from '../../src/application/replay';
+import { level } from '../fixtures/world';
 import { packs } from '../../src/generated/packs';
 import type { Direction } from '../../src/engine/model';
 function recordPlanet20(): ReplayRecorder {
@@ -16,19 +17,23 @@ function recordPlanet20(): ReplayRecorder {
 function recordPlanet6(seed: number): ReplayRecorder {
   const session = new GameSession(packs[0], seed); session.selectPlanet(6); const recorder = new ReplayRecorder(session);
   const mapping: Record<string, Direction> = { R:0, D:1, L:2, U:3 };
-  const route = ['RR','L','R','DRD','LDL','RRRRRRRRRRRR','LLLLLLLLLLLLL','ULU','LDD','DLDRD','RLL','LUURU','ULL','R','URR','L','R','RUU','DDRDRRRR','URRRRRRRRR','DDD','LLLLLLLLLLLL','D'];
+  const route = ['RR','L','R','DRD','LDL','RRRRRRRRRRRR','LLLLLLLLLLLLL','ULU','LDD','DLDRD','RLL','LUURU','ULL','R','URR','L','R','RUU','DDRDRRRR','URRRRRRRRR','DDD','LLLLLLL'];
   for (const section of route) for (const command of section) {
     recorder.action({ type:'command', direction:mapping[command], fire:false }); recorder.step();
-    if (session.world.status === 'dead') throw Error('Route lost');
+    if (session.world.status === 'dead') {
+      expect([session.world.robot.x, session.world.robot.y, session.world.tick]).toEqual([7, 16, 162]);
+      return recorder;
+    }
     while (session.world.teleportTicks) recorder.step();
   }
-  if (session.world.status !== 'won') throw Error('Route incomplete');
-  return recorder;
+  throw Error('Expected bird contact on the formerly winning route');
 }
 describe('Seeded normal-API replays', () => {
-  it('replays the complete legal planet6 route with seeded enemy randomness', () => {
+  it('replays the former planet6 route ending in bird contact death', () => {
     const recorder = recordPlanet6(3);
-    expect(playReplay(recorder.export(), packs).world.status).toBe('won');
+    const replayed = playReplay(recorder.export(), packs);
+    expect(replayed.world.status).toBe('dead');
+    expect(checkpoint(replayed)).toBe(checkpoint(recorder.session));
   });
   it('replays a legal authored planet20 pickup/teleport/bomb route and reproduces its state/events', () => {
     const recorder = recordPlanet20();
@@ -48,6 +53,17 @@ describe('Seeded normal-API replays', () => {
     for (let tick = 0; tick < GameSession.deathRestartTicks; tick++) recorder.step();
     expect(session.world.status).toBe('playing');
     expect(checkpoint(playReplay(recorder.export(), packs))).toBe(checkpoint(session));
+  });
+  it('replays bird adjacency death with matching state and events', () => {
+    const pack = { id: 'bird-contact', name: 'Bird contact', lastLevel: 1,
+      levels: [level(['.......', '...s...', '.R.^...', '.......'], { '3,2': [3] })] };
+    const session = new GameSession(pack, 7); session.start();
+    const recorder = new ReplayRecorder(session);
+    recorder.action({ type: 'command', direction: 0, fire: false }); recorder.step();
+    expect(session.world.status).toBe('dead');
+    expect(checkpoint(playReplay(recorder.export(), [pack]))).toBe(checkpoint(session));
+    const old = JSON.parse(recorder.export()); old.engine = 'robbo-java-1';
+    expect(() => playReplay(JSON.stringify(old), [pack])).toThrow('Incompatible replay');
   });
   it('rejects incompatible campaigns, malformed commands and reports first divergence', () => {
     const recorder = recordPlanet20(), data = JSON.parse(recorder.export());

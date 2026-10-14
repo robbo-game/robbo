@@ -35,8 +35,8 @@ describe('Bounded mirror transfer policies (#20)', () => {
     expect(w.events.filter(e => e.type === 'teleport')).toHaveLength(0);
   });
 
-  it('suppresses adjacency death during materialization but restores it afterward', () => {
-    const w = transfer(); const bear = w.spawn('bear', 8, 1); bear.age = 0;
+  it.each(['bear', 'bird'] as const)('suppresses %s adjacency during materialization but restores it afterward', kind => {
+    const w = transfer(); const bear = w.spawn(kind, 8, 1, undefined, kind === 'bird' ? [0] : []); bear.age = 0;
     // Freeze this adjacency hazard with surrounding walls and deterministic observer state.
     bear.observer = 1; bear.hand = 1;
     w.spawn('wall', 8, 2); w.spawn('wall', 7, 1); w.spawn('wall', 9, 1);
