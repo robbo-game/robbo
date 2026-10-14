@@ -33,7 +33,7 @@ async function main() {
         assert(rendering.width >= Math.round(rendering.cssWidth * 2) - 1, 'Modern artwork must retain a supersampled backing canvas');
         assert.equal(rendering.smoothing, true);
         assert.equal(rendering.css, 'auto');
-        assert.equal(await page.locator('.hud .icon canvas').count(), 4, 'Inventory must use the selected artwork');
+        assert.equal(await page.locator('.hud .icon canvas').count(), 3, 'Inventory must use the selected artwork');
         // Inspect the compositor's screenshot before any Canvas pixel readback.
         // Readback itself can flush drawing and hide a dropped-layer regression.
         const sample = await page.evaluate(() => {
@@ -107,7 +107,7 @@ async function main() {
       assert.deepEqual(await page.evaluate(() => window.robboTest.snapshot()), beforeFailure.snapshot, 'A successful retry must preserve gameplay');
       const retry = await page.evaluate(() => window.robboTest.artwork.state());
       assert.deepEqual({ active: retry.active, theme: retry.theme, artwork: retry.artwork, selected: retry.selected, stored: retry.stored, hudCanvases: retry.hudCanvases }, {
-        active: 'neon-forge-v1', theme: 'neon-forge-v1', artwork: 'modern', selected: 'neon-forge-v1', stored: 'neon-forge-v1', hudCanvases: 0
+        active: 'neon-forge-v1', theme: 'neon-forge-v1', artwork: 'modern', selected: 'neon-forge-v1', stored: 'neon-forge-v1', hudCanvases: 3
       }, 'A later retry must commit every theme marker');
       assert.equal(retry.canvasLabel, beforeFailure.artwork.canvasLabel, 'A successful retry must restore the board accessibility label');
       await page.evaluate(() => {

@@ -20,7 +20,7 @@ export const english = {
   "ui.robbo": "ROBBO",
   "ui.watch.your.step": "Watch your step.",
   "ui.start.game": "Start game",
-  "ui.restart.planet": "Restart planet",
+  "ui.restart.planet": "Reset planet",
   "ui.pause": "Pause",
   "ui.fullscreen": "Fullscreen",
   "ui.robbo.i.edited.legacy": "Robbo I · edited legacy",

@@ -12,6 +12,7 @@ const fs = require('node:fs');
     await page.locator('#continue').click();
     await page.waitForTimeout(1800);
     await page.screenshot({ path: 'artifacts/mobile-portrait.png' });
+    await page.locator('.hud').screenshot({ path: 'artifacts/mobile-hud-detail.png' });
     await page.locator('.touch-controls').screenshot({ path: 'artifacts/mobile-controls-detail.png' });
     await page.setViewportSize({ width: 844, height: 390 });
     await page.waitForTimeout(200);

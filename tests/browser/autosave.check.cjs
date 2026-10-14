@@ -74,6 +74,12 @@ async function move(page, key) {
     await page.locator('#continue').click();
     await page.waitForFunction(tick => Number(document.getElementById('board').dataset.tick) > Number(tick), tick);
     await page.locator('#pause').click();
+    await page.locator('#restart').click();
+    await page.locator('#pause').click();
+    await page.reload();
+    await page.waitForFunction(() => document.getElementById('state-title').textContent === 'Paused');
+    assert.equal((await readSave(page)).world.ammo, 0, 'Planet reset replaces the saved inventory');
+    assert.equal(await page.locator('#planet').inputValue(), '20');
     await page.getByRole('button', { name: 'Reset saved progress' }).click();
     await page.locator('#pause').click();
     await page.reload();

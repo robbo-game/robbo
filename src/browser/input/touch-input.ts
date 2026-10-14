@@ -19,9 +19,6 @@ export function attachTouch(input: ActionInput, options: {
   start: () => void;
 }): { reset: () => void } {
   const state = new PointerActions(input);
-  document.getElementById('touch-restart')?.addEventListener('click', () => {
-    options.retry(); document.getElementById('back-to-game')?.click();
-  });
   const panel = document.createElement('section'); panel.className = 'touch-controls'; panel.setAttribute('aria-label', 'Touch game controls');
   const description = document.createElement('p'); description.textContent = 'Hold or slide across the D-pad to move. Its centre stops movement. Hold Fire with your other thumb and a direction to shoot. Release the direction first to stop in place. Release Fire while holding a direction to move again.';
   const pad = document.createElement('div'); pad.className = 'touch-dpad'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', 'Movement'); panel.append(pad);
