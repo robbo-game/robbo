@@ -13,7 +13,11 @@ first. Fire alone neither fires nor selects a direction. There are no diagonal m
 Portrait reserves a control deck below the board. Landscape phones reserve side
 rails, keeping both thumbs off the game tiles. The camera still follows Robbo at
 the existing tile size. Safe-area padding is inherited from the play container.
-The D-pad targets are 52 × 52 CSS pixels; Fire is 88 × 88. Pressed directions and
+The D-pad targets range from 48 × 48 to 52 × 52 CSS pixels; Fire is 96 × 96.
+Directions use 32 px SVG icons and Fire uses a 40 px crosshair, avoiding font
+fallback and baseline differences on Android. Both thumb zones are centred in
+equal-width portrait columns. Raised borders and an inset pressed state make
+touch feedback visible without shifting the controls. Pressed directions and
 Fire show immediate visual feedback. Pause stays in the top bar; Restart moves
 to Settings on touch devices. Native button keyboard activation remains available.
 

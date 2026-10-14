@@ -30,9 +30,19 @@ export function attachTouch(input: ActionInput, options: {
   const refresh = () => { for (const [action, button] of buttons) button.setAttribute('aria-pressed', String([...state.pointers.values()].includes(action))); };
   const command = () => { const action = input.command(); if (action && options.active()) options.command(action.direction, action.fire); };
   const release = (id: number) => { state.release(id); captures.delete(id); refresh(); };
-  for (const [action, text] of [['up', '↑ Up'], ['left', '← Left'], ['down', '↓ Down'], ['right', '→ Right'], ['fire', 'Fire (hold)']] as const) {
-    const button = document.createElement('button'); button.type = 'button'; button.textContent = text; button.dataset.action = action; button.setAttribute('aria-label', action === 'fire' ? 'Fire (hold while aiming)' : `Move ${action}`);
-    button.textContent = action === 'fire' ? '◎' : text.split(' ')[0];
+  for (const action of ['up', 'left', 'down', 'right', 'fire'] as const) {
+    const button = document.createElement('button'); button.type = 'button'; button.dataset.action = action;
+    button.setAttribute('aria-label', action === 'fire' ? 'Fire (hold while aiming)' : `Move ${action}`);
+    button.setAttribute('aria-pressed', 'false');
+    // SVG geometry avoids platform-specific font baselines and fallback glyph sizes.
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('viewBox', '0 0 32 32'); icon.setAttribute('aria-hidden', 'true'); icon.setAttribute('focusable', 'false');
+    if (action === 'fire') {
+      icon.innerHTML = '<circle cx="16" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="3" fill="currentColor"/><path d="M16 2v6m0 16v6M2 16h6m16 0h6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>';
+    } else {
+      icon.innerHTML = '<path d="M16 4 28 17h-8v11h-8V17H4Z" fill="currentColor"/>';
+    }
+    button.append(icon);
     if (action === 'fire') { const label = document.createElement('span'); label.textContent = 'FIRE'; button.append(label); }
     button.addEventListener('pointerdown', event => {
       if (event.button !== 0) return;
