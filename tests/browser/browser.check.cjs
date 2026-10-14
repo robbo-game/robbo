@@ -35,6 +35,7 @@ async function main() {
         HTMLMediaElement.prototype.play = function () { window.audioCalls.push(this.src); return original.call(this); };
       });
       await page.goto(base);
+      await page.waitForFunction(() => document.getElementById('board').dataset.tick !== undefined);
       assert.equal(await page.locator('#object-help details').count(), 6);
       const helpSummary = page.locator('#object-help summary').first();
       await helpSummary.focus(); await page.keyboard.press('Enter');
@@ -45,7 +46,7 @@ async function main() {
       await page.locator('#continue').click();
       await page.waitForFunction(() => document.getElementById('board').dataset.effect !== 'arrival');
       assert.equal(await page.evaluate(() => 'robboTest' in window), false, 'Test harness must be absent in normal play');
-      assert.equal(await page.locator('#remaining').getAttribute('data-value'), '6');
+      assert.equal(await page.locator('#remaining').getAttribute('data-value'), '9');
       await page.keyboard.press('ArrowLeft');
       await page.waitForFunction(() => document.getElementById('board').dataset.robot === '1,2');
       await page.locator('#pause').click();

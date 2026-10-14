@@ -5,9 +5,10 @@ interface ProgressRecord { version: 1; active: string; campaigns: Record<string,
 const KEY = 'robbo.progress.v1';
 export class CampaignStore {
   private record: ProgressRecord;
+  private get defaultPack(): Pack { return this.packs.find(pack => pack.id === '01') ?? this.packs[0]; }
   constructor(private packs: Pack[], private storage = browserStorage()) {
     const raw = readRecord(storage, KEY) as Partial<ProgressRecord> | null;
-    this.record = { version: 1, active: packs[0].id, campaigns: {} };
+    this.record = { version: 1, active: this.defaultPack.id, campaigns: {} };
     for (const pack of packs) {
       const saved = raw?.version === 1 ? raw.campaigns?.[pack.id] : undefined;
       const planet = (n: unknown) => typeof n === 'number' && Number.isInteger(n) ? Math.max(1, Math.min(pack.levels.length, n)) : 1;
@@ -29,7 +30,7 @@ export class CampaignStore {
   }
   reset(): void {
     for (const pack of this.packs) this.record.campaigns[pack.id] = { reached: 1, selected: 1, completed: false };
-    this.record.active = this.packs[0].id; this.save();
+    this.record.active = this.defaultPack.id; this.save();
   }
   private save(): void { writeRecord(this.storage, KEY, this.record); }
 }

@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:input": "npm run package && node tests/browser/input.check.cjs",
     "test:touch-shooting": "npm run package && node tests/browser/touch-shooting.check.cjs",
+    "test:autosave": "npm run package && node tests/browser/autosave.check.cjs",
     "test:session-browser": "npm run package && node tests/browser/session.check.cjs",
     "test:viewport": "npm run package && node tests/browser/viewport.check.cjs",
     "test:browser": "npm run package && node tests/browser/browser.check.cjs",

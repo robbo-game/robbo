@@ -1,3 +1,5 @@
+import { AttemptStore } from '../browser/persistence/attempt-store';
+import { saveAttempt, restoreAttempt, type SavedAttempt } from '../application/saved-attempt';
 import { createThemeController } from './theme-controller';
 import { createBoardRenderer } from '../presentation/rendering/board-renderer';
 import { replayControls } from './replay-controls';
@@ -19,11 +21,22 @@ import type { Direction, LevelData } from '../engine/model';
 import { MilestoneEffects, CURTAIN_CLOSE_START_MS } from '../presentation/rendering/milestone-effects';
 
 /** Compose the browser controls, session and rendering lifecycle. */
-export function startGame(): void {
+export async function startGame(): Promise<void> {
   const element = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
   const progress = new CampaignStore(packs);
   let session = new GameSession(packs.find(p => p.id === progress.active)!);
   session.selectPlanet(progress.get(session.pack.id).selected); session.started = false;
+  const testMode = location.hash === '#test';
+  const attemptStore = testMode ? undefined : new AttemptStore();
+  let restored = false, restoreFailed = false, savedAt = 0;
+  // Finish loading before registering input or starting the simulation timer.
+  if (attemptStore) {
+    const candidates = await attemptStore.load();
+    for (const candidate of candidates) {
+      try { session = restoreAttempt(candidate, packs); savedAt = (candidate as SavedAttempt).savedAt; restored = true; break; }
+      catch { restoreFailed = true; }
+    }
+  }
   for (const node of document.querySelectorAll<HTMLElement>('[data-text]')) {
     const key = node.dataset.text as TextKey;
     if (key in english) node.textContent = text(key);
@@ -50,6 +63,7 @@ export function startGame(): void {
     const body = document.createElement('p'); body.textContent = text(`help.${topic}.body` as TextKey);
     section.append(summary, body); objectHelp.append(section);
   }
+  const didRestore = restored;
   const canvas = element<HTMLCanvasElement>('board');
   const camera = new Camera();
   const artwork = createThemeController(canvas, themeSelector, render);
@@ -98,7 +112,8 @@ export function startGame(): void {
   function focusWorld(): void {
     clearInput(); audio.stop(); effects.reset(); camera.reset();
     previousStatus = session.world.status;
-    if (session.started && !replay.viewing) effects.arrive(session.world);
+    if (session.started && !replay.viewing && !restored) effects.arrive(session.world);
+    restored = false;
     camera.focus(session.world);
     refreshPlanets();
     element<HTMLSelectElement>('planet').value = String(session.planet);
@@ -122,6 +137,7 @@ export function startGame(): void {
     element('campaign-intro').textContent = `A journey through ${session.pack.levels.length} planets`;
     if (generation !== session.generation) { generation = session.generation; focusWorld(); }
     drawBoard(view);
+    persistAttempt();
     canvas.dataset.camera = `${camera.x},${camera.y}`;
     canvas.dataset.tick = String(world.tick);
     canvas.dataset.state = session.completed ? 'completed' : world.status;
@@ -160,6 +176,18 @@ export function startGame(): void {
     canvas.dataset.effect = effect?.kind ?? '';
     canvas.dataset.effectTime = String(Math.round(effect?.elapsed ?? 0));
     renderer.draw(session.world, view, session.pack.id, session.planet, effect, reducedMotion.matches);
+  }
+  let lastSavedKey = '';
+  function persistAttempt(leaving = false): void {
+    if (!attemptStore || replay.viewing) return;
+    const key = `${session.generation}:${session.world.tick}:${session.world.status}:${session.started}:${session.completed}:${session.paused}`;
+    if (!leaving && key === lastSavedKey) return;
+    lastSavedKey = key; savedAt = Math.max(Date.now(), savedAt + 1);
+    const checkpoint = saveAttempt(session, savedAt);
+    void attemptStore.save(checkpoint, leaving).then(saved => {
+      const recovery = restoreFailed && !didRestore ? 'The previous game could not be restored. This planet has been restarted. ' : '';
+      element('save-status').textContent = recovery + (saved ? 'Game saved in this browser. Return here to continue.' : 'Saving is unavailable in this browser. Your game will not survive closing this page.');
+    });
   }
   const replay = replayControls(packs, () => session, value => { session = value; generation = -1; clearInput(); audio.stop(); render(); });
   function replayAction(action: ReplayAction): void {
@@ -220,7 +248,7 @@ export function startGame(): void {
     render();
   }
   const resetProgress = document.createElement('button'); resetProgress.textContent = text('progress.reset');
-  resetProgress.addEventListener('click', () => { replay.cancel(); progress.reset(); session.newCampaign(packs[0]); render(); });
+  resetProgress.addEventListener('click', () => { replay.cancel(); progress.reset(); session.newCampaign(packs.find(pack => pack.id === '01') ?? packs[0]); render(); });
   document.querySelector('.campaign-settings')!.append(resetProgress);
   element('continue').addEventListener('click', startOrContinue);
   element('start').addEventListener('click', () => { if (session.started) { replay.cancel(); session.newCampaign(); } else { session.start(); effects.arrive(session.world); } render(); activateAudio(); canvas.focus({ preventScroll: true }); });
@@ -244,9 +272,10 @@ export function startGame(): void {
   function pauseInBackground(): void {
     clearInput();
     if (session.started && !session.paused && !session.completed) { replayAction({ type: 'pause' }); audio.pause(); }
-    render();
+    render(); persistAttempt(true);
   }
   addEventListener('blur', pauseInBackground);
+  addEventListener('pagehide', pauseInBackground);
   document.addEventListener('visibilitychange', () => { if (document.hidden) pauseInBackground(); });
   let resizeFrame = 0;
   function scheduleResize(): void {
