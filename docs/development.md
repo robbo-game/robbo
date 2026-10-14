@@ -34,6 +34,7 @@ npx playwright install chromium firefox
 npm run test:dev
 npm run test:browser
 npm run test:input
+npm run test:touch-shooting
 npm run test:session-browser
 npm run test:viewport
 npm run test:artwork
