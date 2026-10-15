@@ -1,0 +1,12 @@
+{
+  "tag": "pr-16-e578ebe194cc0868269276793c31ec3a01f2275d",
+  "title": "Robbo PR #16 · controls-precise-dpad · e578ebe194cc",
+  "prerelease": true,
+  "sha": "e578ebe194cc0868269276793c31ec3a01f2275d",
+  "pr": 16,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/16",
+  "branch": "controls-precise-dpad",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/controls-precise-dpad",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/e578ebe194cc0868269276793c31ec3a01f2275d",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/16\n- Branch: [controls-precise-dpad](https://github.com/sigmalko/robbo/tree/controls-precise-dpad)\n- Built commit: https://github.com/sigmalko/robbo/commit/e578ebe194cc0868269276793c31ec3a01f2275d\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
