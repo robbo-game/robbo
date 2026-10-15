@@ -59,7 +59,7 @@ describe('Precise touch repeats', () => {
     input.set('pointer:2', 'fire', true);
     expect(input.command(3, 100)).toEqual({ direction: 0, fire: true });
     input.set('pointer:1', 'right', false);
-    expect(input.command(3, 100)).toEqual({ direction: 3, fire: true });
+    expect(input.command(3, 100)).toEqual({ direction: 0, fire: true });
     input.release(); expect(input.command(3, 300)).toBeUndefined();
   });
 });
