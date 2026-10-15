@@ -1,0 +1,1 @@
+Open index.html in a modern web browser to play Robbo. No installation or web server is required. Click Start game to enable sound. Use arrow keys to move, Ctrl + arrow to fire, R to retry and P to pause. Collect screws and enter the flashing ship to advance through 56 planets. The campaign selector includes both original legacy map packs.

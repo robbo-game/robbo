@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title data-text="ui.robbo.56.planets">Robbo — 56 planets</title>
+  <link rel="stylesheet" href="styles-page.css">
+  <script defer src="dist/robbo.js"></script>
+</head>
+<body>
+  <main>
+    <div id="play-area">
+    <div class="toolbar">
+      <button id="start" data-text="ui.start.game">Start game</button><button id="restart" data-text="ui.restart.planet">Reset planet</button><button id="pause" data-text="ui.pause"><span data-text="ui.pause.label">Pause</span></button><button id="fullscreen" data-text="ui.fullscreen">Fullscreen</button>
+      <button id="settings">Settings</button>
+    </div>
+    <p id="display-status" role="status"></p>
+    <section class="game" aria-label="Robbo game" data-label="label.robbo.game">
+      <div class="viewport">
+        <canvas id="board" tabindex="0" width="512" height="512" aria-label="Game board. Use arrow keys to move and Control plus arrow to fire." data-label="label.game.board.use.arrow.keys.to.move.and.control"></canvas>
+        <div id="milestone-notice" role="status" aria-live="polite" hidden><strong id="milestone-title"></strong><span id="milestone-help"></span></div>
+        <div id="overlay"><h2 id="state-title">Ready, Robbo?</h2><p id="state-description">Collect every required screw, then enter the flashing ship.</p><button id="continue" data-text="ui.start.game">Start game</button></div>
+      </div>
+      <div class="hud" aria-label="Inventory" data-label="label.inventory" aria-live="off">
+        <div role="group" aria-labelledby="remaining-label"><span class="icon screw-icon" aria-hidden="true"></span><div><span id="remaining-label" class="hud-label" data-text="ui.screws.left">Screws left</span><span id="remaining" class="digits"></span><small><span id="collected">0</span><span data-text="ui.collected.suffix"> collected</span></small></div></div>
+        <div role="group" aria-labelledby="keys-label"><span class="icon key-icon" aria-hidden="true"></span><div><span id="keys-label" class="hud-label" data-text="ui.keys">Keys</span><span id="keys" class="digits"></span></div></div>
+        <div role="group" aria-labelledby="ammo-label"><span class="icon ammo-icon" aria-hidden="true"></span><div><span id="ammo-label" class="hud-label" data-text="ui.ammo">Ammo</span><span id="ammo" class="digits"></span></div></div>
+        <div role="group" aria-labelledby="planet-number-label"><span class="icon planet-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path d="M6 2h4v1h2v1h1v2h1v4h-1v2h-1v1h-2v1H6v-1H4v-1H3v-2H2V6h1V4h1V3h2Z" fill="currentColor"/><path d="M7 3h3v2H8v2H5V5h2Zm3 5h3v2h-2v3H9v-3h1Z" fill="#080b08"/><path d="M1 11v2h4m6-10h4v2" fill="none" stroke="currentColor"/></svg></span><div><span id="planet-number-label" class="hud-label" data-text="ui.planet">Planet</span><span id="planet-number" class="digits"></span><small id="campaign-total" data-text="ui.of.56">of 56</small></div></div>
+      </div>
+    </section>
+    </div>
+    <section id="game-settings" aria-label="Game settings">
+    <header><div><p id="campaign-intro" class="eyebrow" data-text="ui.a.journey.through.56.planets">A journey through 56 planets</p><h1 data-text="ui.robbo">ROBBO</h1></div><p class="intro"><span data-text="ui.intro">Find the screws. Reach the ship.</span><br><span data-text="ui.watch.your.step">Watch your step.</span></p></header>
+    <button id="back-to-game">Back to game</button>
+    <label>Touch layout <select id="touch-fire-side"><option value="right">FIRE right · movement left</option><option value="left">FIRE left · movement right</option></select></label>
+    <p>Touch: slide or hold the D-pad to move. To shoot, hold FIRE with one thumb, then choose a direction with your other thumb. Slide to change aim. Release the direction first to stop in place; releasing FIRE first resumes movement.</p>
+    <div class="campaign-settings">
+      <label>Artwork <select id="theme" aria-label="Choose artwork layout"></select></label>
+      <label><span data-text="ui.campaign.label">Campaign </span><select id="pack"><option value="02" data-text="ui.robbo.i.edited.legacy">Robbo I · edited legacy</option><option value="01" data-text="ui.robbo.i.original.legacy">Robbo I · original legacy</option></select></label>
+      <label><span data-text="ui.planet.label">Planet </span><select id="planet" aria-label="Select planet" data-label="label.select.planet"></select></label>
+    </div>
+    <div class="below"><p id="level-info"></p><div class="audio-controls"><button id="enable-sound" data-text="ui.enable.sound">Enable sound</button><label><input type="checkbox" id="mute"><span data-text="ui.mute.label"> Mute</span></label><label><span data-text="ui.volume.label">Volume </span><input id="volume" type="range" min="0" max="100" value="60"></label></div></div>
+    <p id="save-status" role="status"></p>
+    <p id="audio-status" role="status"></p>
+    <p id="exit-status" role="status" aria-live="polite"></p>
+    <p class="controls"><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> <span data-text="ui.move.label">Move &nbsp;</span> <kbd data-text="ui.ctrl">Ctrl</kbd> <span data-text="ui.fire.label">+ arrow Fire &nbsp;</span> <kbd data-text="ui.r">R</kbd> <span data-text="ui.retry.label">Retry &nbsp;</span> <kbd data-text="ui.p">P</kbd> <span data-text="ui.pause.label">Pause</span></p>
+    <details><summary data-text="ui.how.to.play">How to play</summary><p data-text="help.overview.inventory">Pick up ammunition for 9 shots. Keys open one door each; enter it on your next step. Push boxes, bombs, question boxes and an inactive ship into free space. Shoot sand to clear a path. A question box reveals a random object after it is shot.</p><p data-text="help.overview.hazards">Enemies, bullets, flames, lasers, rivers and magnets can kill Robbo. Mirrors teleport between linked destinations. Bombs trigger nearby bombs. A destroyed required screw or ship can make a planet impossible to finish: press R to retry. Retries are unlimited.</p><p data-text="help.overview.campaigns">The planet selector lets you revisit any stage. Each campaign contains the same 56 planets with a few historical layout differences; inventories reset between planets.</p></details>
+    <section aria-labelledby="object-help-title"><h2 id="object-help-title" data-text="help.title"></h2><div id="object-help"></div></section>
+    <footer data-text="ui.credits">Original levels by Janusz Pelc · Java legacy mechanics restored in TypeScript</footer>
+    </section>
+  </main>
+</body>
+</html>
