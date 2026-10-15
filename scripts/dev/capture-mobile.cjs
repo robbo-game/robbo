@@ -28,6 +28,8 @@ const fs = require('node:fs');
     await page.setViewportSize({ width: 390, height: 760 });
     await page.evaluate(() => { window.robboTest.planet(1); window.robboTest.inventory(9); });
     await page.waitForTimeout(200);
+    await page.selectOption('#touch-movement', 'dpad');
+    await page.locator('#back-to-game').click();
     const cdp = await page.context().newCDPSession(page);
     const point = async (action, id) => {
       const b = await page.locator(`[data-action="${action}"]`).boundingBox();

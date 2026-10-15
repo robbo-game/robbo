@@ -37,6 +37,9 @@ jobs:
       - run: npm run test:dev
       - run: node tests/browser/browser.check.cjs
       - run: node tests/browser/input.check.cjs
+      - run: node tests/browser/precise-touch.check.cjs
+      - run: node tests/browser/gesture-touch.check.cjs
+      - run: node tests/browser/touch-shooting.check.cjs
       - run: node tests/browser/session.check.cjs
       - run: node tests/browser/autosave.check.cjs
       - run: node tests/browser/previews.check.cjs
