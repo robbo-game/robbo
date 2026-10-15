@@ -1,0 +1,135 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; color: #e3ebd5; background: #111710; }
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(ellipse at top, #253422, #111710 65%); min-height: 100vh; }
+main { margin: 0; }
+#play-area { height: 100vh; height: var(--screen-height, 100dvh); display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+#game-settings, .input-settings, .replay-controls { max-width: 780px; margin: 0 auto; padding: 24px 18px; }
+.campaign-settings { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 16px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 22px; }
+h1 { font: 800 clamp(36px, 7vw, 54px)/1 monospace; margin: 5px 0; letter-spacing: .16em; color: #caff45; }
+.eyebrow { color: #abb6a0; text-transform: uppercase; letter-spacing: .18em; font-size: 10px; margin: 0; }
+.intro { color: #b7c3af; line-height: 1.6; font-size: 14px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px; }
+#display-status { margin: 0; padding: 4px; font-size: 12px; }
+#display-status:empty { display: none; }
+button, select { font: inherit; font-size: 13px; color: #e3ebd5; background: #253222; border: 1px solid #506344; border-radius: 5px; padding: 8px 11px; }
+button { cursor: pointer; min-height: 44px; } select { min-height: 44px; } button:hover { background: #3b4c30; } button:disabled { cursor: default; opacity: .5; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
+#start, #continue { background: #caff45; border-color: #caff45; color: #18210b; font-weight: 700; }
+label { font-size: 12px; color: #b7c3af; } select { margin-left: 5px; }
+.game { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; background: #080b08; }
+.viewport { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; background: #608050; }
+canvas { position: absolute; inset: 0; touch-action: none; }
+#overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #060a06db; padding: 24px; text-align: center; }
+#overlay[hidden] { display: none; } h2 { color: #caff45; font-size: 28px; } #overlay p { max-width: 330px; line-height: 1.6; }
+#milestone-notice { position: absolute; z-index: 1; top: 16px; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); padding: 12px 22px; border: 1px solid #ffe09999; border-radius: 6px; background: #111a20ed; color: #ffe6a8; box-shadow: 0 0 30px #ffda7833; text-align: center; pointer-events: none; }
+#milestone-notice[hidden] { display: none; }
+#milestone-notice strong { display: block; font: 800 clamp(13px, 2.5vw, 19px)/1.3 ui-monospace, monospace; letter-spacing: .1em; }
+#milestone-notice span { display: block; margin-top: 5px; font-size: 12px; color: #eceddc; }
+#milestone-notice[data-kind="departure"] { border-color: #a9e7ff99; color: #d2f3ff; box-shadow: 0 0 30px #72dfff22; }
+.hud > .screws-secured { background: #ffe09912; border-radius: 5px; box-shadow: inset 0 2px #ffe099; }
+.hud > .screws-secured .hud-label { color: #ffe6a8; }
+#overlay { z-index: 2; }
+@media (max-height: 420px) { #milestone-notice { top: 6px; padding: 6px 12px; } #milestone-notice span { font-size: 10px; margin-top: 2px; } }
+.hud { padding: 8px; background: #080b08; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.hud > div { display: flex; justify-content: center; gap: 6px; align-items: center; min-width: 0; }
+/* The original HUD uses pictograms. Names remain available to screen readers. */
+.hud-label, .hud small { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.icon { display: inline-block; width: 32px; height: 32px; flex-shrink: 0; background: url(legacy-icons32.png); image-rendering: pixelated; }
+.screw-icon { background-position: -138px -104px; }.key-icon { background-position: -206px -104px; }.ammo-icon { background-position: -240px -104px; }
+.planet-icon { background: none; color: #ffff00; }
+.planet-icon svg { display: block; width: 100%; height: 100%; }
+.icon canvas { position: static; width: 100%; height: 100%; background: transparent; image-rendering: auto; }
+@media (max-width: 600px) { .hud { gap: 4px; }.hud .icon { width: 24px; height: 24px; background-size: 307.5px 205.5px; }.screw-icon { background-position: -103.5px -78px; }.key-icon { background-position: -154.5px -78px; }.ammo-icon { background-position: -180px -78px; } }
+.digits { display: flex; min-height: 32px; }.digit { display: inline-block; width: 16px; height: 32px; background-image: url(numbers.png); background-position: calc(var(--digit) * -18px) 0; image-rendering: pixelated; color: transparent; }
+/* The modern layout deliberately uses CSS HUD art, keeping it as editable as its generated atlas. */
+html[data-theme="neon-forge-v1"] { color-scheme: dark; }
+html[data-theme="neon-forge-v1"] body { background: radial-gradient(ellipse at top, #12336a, #050a18 68%); }
+html[data-theme="neon-forge-v1"] h1 { color: #6df5ff; text-shadow: 0 0 18px #19a7ff88; }
+html[data-theme="neon-forge-v1"] .game, html[data-theme="neon-forge-v1"] .hud { background: #07101f; border-color: #2872a8; }
+html[data-theme="neon-forge-v1"] button, html[data-theme="neon-forge-v1"] select { background: #10264a; border-color: #348bc4; }
+html[data-theme="neon-forge-v1"] button:hover { background: #193b6f; }
+html[data-theme="neon-forge-v1"] #start, html[data-theme="neon-forge-v1"] #continue { background: #58e5ff; border-color: #58e5ff; color: #041321; }
+html[data-theme="neon-forge-v1"] .planet-icon { color: #9ff8ff; }
+html[data-theme="neon-forge-v1"] .digit { background: none; color: #9ff8ff; text-shadow: 0 0 7px #36dfff; font: 800 25px/32px ui-monospace, monospace; width: 15px; text-align: center; }
+html[data-artwork="modern"] body { background: radial-gradient(ellipse at top, var(--planet-colour), #10151b 80%); }
+html[data-theme^="planet-journey-"] #board { image-rendering: auto; }
+html[data-theme^="planet-journey-"] .game { border-color: #87765d; border-radius: 18px; background: #151a1c; box-shadow: 0 16px 40px #0004; }
+html[data-theme^="planet-journey-"] .hud { background: #151a1c; }
+html[data-theme^="planet-journey-"] h1, html[data-theme^="planet-journey-"] h2 { color: #e8cf9b; }
+html[data-theme^="planet-journey-"] #start, html[data-theme^="planet-journey-"] #continue { background: #dfc38f; border-color: #dfc38f; color: #242a29; }
+html[data-theme^="planet-journey-"] .planet-icon { color: #e4e8de; }
+html[data-artwork="modern"] .digit { background: none; color: #e4e8de; font: 800 25px/32px ui-monospace, monospace; width: 15px; text-align: center; }
+.below { display: flex; justify-content: space-between; gap: 15px; align-items: center; flex-wrap: wrap; margin-top: 16px; font-size: 12px; color: #a7b39c; }
+.audio-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }input[type=range] { width: 80px; vertical-align: middle; accent-color: #caff45; }
+#audio-status { font-size: 12px; color: #c6ca99; } .controls { font-size: 12px; line-height: 2.6; color: #a7b39c; }kbd { font-family: monospace; border: 1px solid #506344; border-bottom-width: 3px; padding: 2px 5px; border-radius: 3px; color: #e3ebd5; }
+details { border-top: 1px solid #364330; padding-top: 14px; font-size: 13px; line-height: 1.7; color: #b7c3af; }summary { cursor: pointer; color: #d6e2cb; }footer { margin-top: 28px; color: #75836b; font-size: 11px; }
+@media (max-width: 600px), (max-height: 500px) { .intro { display: none; }.toolbar button { padding: 6px; font-size: 12px; flex: 1; } }
+
+/* A dedicated thumb area keeps fingers off the board. */
+.touch-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; flex: none; align-items: center; justify-items: center; padding: 12px 8px 16px; background: linear-gradient(#172318, #101910); border-top: 1px solid #3d5034; }
+html[data-touch-fire-side="left"] .touch-dpad { order: 2; }
+html[data-touch-fire-side="left"] .touch-controls [data-action="fire"] { order: 1; }
+.touch-dpad { --pad-cell: clamp(48px, 13.33vw, 52px); display: grid; grid-template: repeat(3, var(--pad-cell)) / repeat(3, var(--pad-cell)); border-radius: 50%; background: radial-gradient(circle, #34432c 0%, #202d1e 65%, #192418 100%); touch-action: none; }
+.touch-controls button { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 48px; min-height: 48px; padding: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; border-radius: 15px; background: linear-gradient(#35472e, #253421); border: 1px solid #718960; color: #edf8df; box-shadow: inset 0 1px 0 #d9efbd20, 0 3px 0 #080e08; }
+.touch-controls svg { display: block; width: 32px; height: 32px; flex: none; pointer-events: none; }
+.touch-dpad [data-action="left"] svg { transform: rotate(-90deg); }
+.touch-dpad [data-action="right"] svg { transform: rotate(90deg); }
+.touch-dpad [data-action="down"] svg { transform: rotate(180deg); }
+.touch-dpad [data-action="up"] { grid-area: 1 / 2; }
+.touch-dpad [data-action="left"] { grid-area: 2 / 1; }
+.touch-dpad [data-action="right"] { grid-area: 2 / 3; }
+.touch-dpad [data-action="down"] { grid-area: 3 / 2; }
+.touch-controls [data-action="fire"] { width: 96px; height: 96px; gap: 4px; border-radius: 50%; background: linear-gradient(145deg, #dcff83, #b8f12c); color: #1b2b0a; border: 2px solid #e2ff9f; box-shadow: inset 0 2px 0 #f3ffd680, 0 4px 0 #57741c, 0 6px 14px #0004; }
+.touch-controls [data-action="fire"] svg { width: 40px; height: 40px; }
+.touch-controls [data-action="fire"] span { display: block; font-size: 13px; line-height: 16px; font-weight: 800; letter-spacing: .08em; padding-left: .08em; pointer-events: none; }
+.touch-controls button[aria-pressed="true"] { background: #dcff87; border-color: #efffd0; color: #182a0b; box-shadow: inset 0 2px 6px #172a0b55; }
+.touch-controls [data-action="fire"][aria-pressed="true"] { background: #f0ffcb; box-shadow: inset 0 3px 8px #37561566; }
+.touch-controls p { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+@media (hover: hover) and (pointer: fine) { .touch-controls { display: none; } }
+@media (pointer: coarse) {
+  .toolbar button { min-height: 48px; }
+  .toolbar #start { display: none; }
+  .hud { padding: 4px 12px; }
+}
+/* Landscape puts the thumbs beside the board instead of covering its tiles. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .game { position: relative; padding: 0 116px 0 176px; }
+  .touch-controls { position: absolute; inset: 0; padding: 0; background: transparent; border: 0; pointer-events: none; }
+  .touch-dpad { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+  .touch-controls [data-action="fire"] { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
+  .touch-controls button { pointer-events: auto; }
+  html[data-touch-fire-side="left"] .game { padding-left: 116px; padding-right: 176px; }
+  html[data-touch-fire-side="left"] .touch-dpad { left: auto; right: 10px; }
+  html[data-touch-fire-side="left"] .touch-controls [data-action="fire"] { right: auto; left: 14px; }
+}
+
+.input-settings label { display: inline-block; margin: .5rem; }
+.input-settings input[readonly] { width: 7rem; padding: .5rem; }
+/* The viewport fills the screen; world coordinates stay independent of layout. */
+select { max-width: 100%; }
+.toolbar label { min-width: 0; }
+#level-info, #overlay p { overflow-wrap: anywhere; }
+:fullscreen { overflow: hidden; }
+:fullscreen main > :not(#play-area) { display: none; }
+:fullscreen #play-area { height: 100vh; height: 100dvh; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto; } }
+#object-help details { margin-top: 10px; }
+#object-help summary:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
+#object-help p, [data-text] { overflow-wrap: anywhere; }
+
+/* Gesture preview: a dedicated thumb surface keeps fingers off the board. */
+.touch-gesture { display: none; width: 156px; height: 156px; border: 1px dashed #829d69; border-radius: 22px; background: radial-gradient(#566b41 1px, transparent 1px) 0 0 / 12px 12px, #1c2a1c; color: #d6f5ac; touch-action: none; user-select: none; -webkit-user-select: none; }
+.touch-gesture svg { width: 96px; height: 96px; opacity: .75; }
+.touch-gesture span { font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.touch-gesture:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
+.touch-gesture[data-direction]:not([data-direction=""]) { border-color: #caff45; box-shadow: inset 0 0 0 2px #caff4533; }
+html[data-touch-movement="gestures"] .touch-dpad { display: none; }
+html[data-touch-movement="gestures"] .touch-gesture { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+html[data-touch-fire-side="left"] .touch-gesture { order: 2; }
+@media (max-width: 340px) { .touch-gesture { width: 144px; height: 144px; } }
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .touch-gesture { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: auto; }
+  html[data-touch-fire-side="left"] .touch-gesture { left: auto; right: 10px; }
+}

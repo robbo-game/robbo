@@ -1,0 +1,12 @@
+{
+  "tag": "pr-17-de5f9aff792a73a933f1336ecb6ca2d9f96a827e",
+  "title": "Robbo PR #17 · controls-gesture-pad · de5f9aff792a",
+  "prerelease": true,
+  "sha": "de5f9aff792a73a933f1336ecb6ca2d9f96a827e",
+  "pr": 17,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/17",
+  "branch": "controls-gesture-pad",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/controls-gesture-pad",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/de5f9aff792a73a933f1336ecb6ca2d9f96a827e",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/17\n- Branch: [controls-gesture-pad](https://github.com/sigmalko/robbo/tree/controls-gesture-pad)\n- Built commit: https://github.com/sigmalko/robbo/commit/de5f9aff792a73a933f1336ecb6ca2d9f96a827e\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
