@@ -7,6 +7,9 @@ const directions: Partial<Record<Action, Direction>> = { right: 0, down: 1, left
 /** One ordered action stream; newest held direction wins, never diagonals. */
 export class ActionInput {
   private readonly blocked = new Set<string>();
+  private touchAim?: Direction;
+  private readonly repeatAfter = new Map<string, number>();
+  defer(source: string, until: number): void { this.repeatAfter.set(source, until); }
   readonly held = new Map<string, Action>();
   bindings = { ...defaultBindings };
   deadzone = 0.25;
@@ -17,16 +20,24 @@ export class ActionInput {
     this.padBindings[action] = button; this.release('pad:'); return undefined;
   }
   set(source: string, action: Action, pressed: boolean): boolean {
-    if (!pressed) { this.held.delete(source); this.blocked.delete(source); return false; }
+    if (!pressed) { this.repeatAfter.delete(source); this.held.delete(source); this.blocked.delete(source); return false; }
     if (this.blocked.has(source)) return false;
     if (this.held.get(source) === action) return false;
+    if (directions[action] !== undefined) this.touchAim = source.startsWith('pointer:') ? directions[action] : undefined;
     this.held.delete(source); this.held.set(source, action); return true;
   }
-  release(prefix = ''): void { for (const source of this.held.keys()) if (source.startsWith(prefix)) { this.blocked.add(source); this.held.delete(source); } }
-  command(): { direction: Direction; fire: boolean } | undefined {
-    const actions = [...this.held.values()];
-    const action = actions.reverse().find(a => directions[a] !== undefined);
-    return action ? { direction: directions[action]!, fire: actions.includes('fire') } : undefined;
+  release(prefix = ''): void { if (!prefix || prefix === 'pointer:') this.touchAim = undefined; for (const source of this.held.keys()) if (source.startsWith(prefix)) { this.blocked.add(source); this.held.delete(source); this.repeatAfter.delete(source); } }
+  command(facing?: Direction, now = performance.now()): { direction: Direction; fire: boolean } | undefined {
+    const held = [...this.held.entries()].reverse();
+    const aimed = held.find(([, action]) => directions[action] !== undefined);
+    const fire = held.some(([, action]) => action === 'fire');
+    if (aimed) {
+      if (!fire && now < (this.repeatAfter.get(aimed[0]) ?? 0)) return;
+      return { direction: directions[aimed[1]]!, fire };
+    }
+    // A touch Fire button shoots where Robbo is facing; keyboard/gamepad semantics stay stable.
+    if (facing !== undefined && held.some(([source, action]) => source.startsWith('pointer:') && action === 'fire')) return { direction: this.touchAim ?? facing, fire: true };
+    return;
   }
   bind(action: Action, key: string): string | undefined {
     key = key.length === 1 ? key.toLowerCase() : key;

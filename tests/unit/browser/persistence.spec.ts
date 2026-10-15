@@ -34,10 +34,10 @@ describe('Player preferences', () => {
   it('clamps, ignores unsupported options and applies detached drafts', () => {
     const storage = memory(); storage.setItem('robbo.preferences.v1', JSON.stringify({ version: 1, volume: 3, muted: true, skin: 'unavailable' }));
     const store = new PreferenceStore(storage);
-    expect(store.current).toEqual({ volume: 1, muted: true, touchFireSide: 'right' });
+    expect(store.current).toEqual({ volume: 1, muted: true, touchFireSide: 'right', touchMovement: 'dpad' });
     const draft = store.current; draft.volume = 0; expect(store.current.volume).toBe(1);
     store.apply(draft); expect(new PreferenceStore(storage).current.volume).toBe(0);
-    store.reset(); expect(new PreferenceStore(storage).current).toEqual({ volume: 0.6, muted: false, touchFireSide: 'right' });
+    store.reset(); expect(new PreferenceStore(storage).current).toEqual({ volume: 0.6, muted: false, touchFireSide: 'right', touchMovement: 'dpad' });
   });
   it('rejects future versions and nonfinite values without blocking startup', () => {
     const storage = memory(); storage.setItem('robbo.preferences.v1', JSON.stringify({ version: 2, volume: 0, muted: true }));
@@ -49,15 +49,27 @@ describe('Player preferences', () => {
 describe('Touch layout preferences', () => {
   it('persists a mirrored layout and resets it without losing sound settings', () => {
     const storage = memory(), store = new PreferenceStore(storage);
-    store.apply({ muted: true, volume: .4, touchFireSide: 'left' });
-    expect(new PreferenceStore(storage).current).toEqual({ muted: true, volume: .4, touchFireSide: 'left' });
+    store.apply({ muted: true, volume: .4, touchFireSide: 'left', touchMovement: 'dpad' });
+    expect(new PreferenceStore(storage).current).toEqual({ muted: true, volume: .4, touchFireSide: 'left', touchMovement: 'dpad' });
     expect(store.reset().touchFireSide).toBe('right');
+  });
+  it('remembers either movement mode independently of the thumb layout', () => {
+    const storage = memory(), store = new PreferenceStore(storage);
+    for (const touchMovement of ['gestures', 'dpad'] as const) {
+      store.apply({ touchMovement });
+      store.apply({ touchFireSide: 'left' });
+      expect(new PreferenceStore(storage).current.touchMovement).toBe(touchMovement);
+    }
+    store.apply({ touchMovement: 'gestures' });
+    expect(store.reset().touchMovement).toBe('dpad');
+    storage.setItem('robbo.preferences.v1', JSON.stringify({ version: 1, touchMovement: 'invalid' }));
+    expect(new PreferenceStore(storage).current.touchMovement).toBe('dpad');
   });
   it('accepts older records and falls back from invalid layouts', () => {
     const storage = memory();
     for (const touchFireSide of [undefined, 'invalid', 5, null]) {
       storage.setItem('robbo.preferences.v1', JSON.stringify({ version: 1, muted: true, volume: .2, touchFireSide }));
-      expect(new PreferenceStore(storage).current).toEqual({ muted: true, volume: .2, touchFireSide: 'right' });
+      expect(new PreferenceStore(storage).current).toEqual({ muted: true, volume: .2, touchFireSide: 'right', touchMovement: 'dpad' });
     }
   });
 });

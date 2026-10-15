@@ -50,3 +50,16 @@ describe('Touch direction selection', () => {
     pointers.reset(); expect(input.command()).toBeUndefined();
   });
 });
+
+describe('Precise touch repeats', () => {
+  it('gates movement repetition but lets the same held direction aim a shot immediately', () => {
+    const input = new ActionInput(); input.set('pointer:1', 'right', true); input.defer('pointer:1', 280);
+    expect(input.command(undefined, 100)).toBeUndefined();
+    expect(input.command(undefined, 280)).toEqual({ direction: 0, fire: false });
+    input.set('pointer:2', 'fire', true);
+    expect(input.command(3, 100)).toEqual({ direction: 0, fire: true });
+    input.set('pointer:1', 'right', false);
+    expect(input.command(3, 100)).toEqual({ direction: 0, fire: true });
+    input.release(); expect(input.command(3, 300)).toBeUndefined();
+  });
+});
