@@ -1,0 +1,12 @@
+{
+  "tag": "pr-19-f2882646f208b57cc795de7a440fe5606165d65c",
+  "title": "Robbo PR #19 · controls-configurable · f2882646f208",
+  "prerelease": true,
+  "sha": "f2882646f208b57cc795de7a440fe5606165d65c",
+  "pr": 19,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/19",
+  "branch": "controls-configurable",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/controls-configurable",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/f2882646f208b57cc795de7a440fe5606165d65c",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/19\n- Branch: [controls-configurable](https://github.com/sigmalko/robbo/tree/controls-configurable)\n- Built commit: https://github.com/sigmalko/robbo/commit/f2882646f208b57cc795de7a440fe5606165d65c\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
