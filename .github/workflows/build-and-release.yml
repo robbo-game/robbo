@@ -107,4 +107,3 @@ jobs:
           else
             gh release create "$release_tag" release/robbo.zip --target "$GITHUB_SHA" --title "Robbo $release_tag" --generate-notes --latest
           fi
-
