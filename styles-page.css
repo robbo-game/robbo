@@ -118,3 +118,22 @@ select { max-width: 100%; }
 #object-help details { margin-top: 10px; }
 #object-help summary:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
 #object-help p, [data-text] { overflow-wrap: anywhere; }
+
+/* Gesture preview: a dedicated thumb surface keeps fingers off the board. */
+.touch-gesture { display: none; width: 156px; height: 156px; border: 1px dashed #829d69; border-radius: 22px; background: radial-gradient(#566b41 1px, transparent 1px) 0 0 / 12px 12px, #1c2a1c; color: #d6f5ac; touch-action: none; user-select: none; -webkit-user-select: none; }
+.touch-gesture svg { width: 96px; height: 96px; opacity: .75; }
+.touch-gesture span { font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.touch-gesture:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
+.touch-gesture[data-direction]:not([data-direction=""]) { border-color: #caff45; box-shadow: inset 0 0 0 2px #caff4533; }
+html[data-touch-movement="gestures"] .touch-dpad { display: none; }
+html[data-touch-movement="gestures"] .touch-gesture { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+html[data-touch-fire-side="left"] .touch-gesture { order: 2; }
+@media (max-width: 340px) { .touch-gesture { width: 144px; height: 144px; } }
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
+  .touch-gesture { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: auto; }
+  html[data-touch-fire-side="left"] .touch-gesture { left: auto; right: 10px; }
+}
+
+#back-to-game { display: block; margin-bottom: 16px; }
+.touch-preference { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 12px 0; }
+.touch-preference select { margin-left: 0; min-width: 0; }
