@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
-const { targetForRun, installSite } = require('../../scripts/release/pages-preview.cjs');
+const { targetForRun, installSite, checkoutCache } = require('../../scripts/release/pages-preview.cjs');
 const repo = 'owner/robbo', sha = 'a'.repeat(40);
 const pull = { state: 'open', number: 16, title: 'Gesture <test>', head: { sha, ref: 'gestures', repo: { full_name: repo } } };
 const build = { conclusion: 'success', event: 'pull_request', head_branch: 'gestures', head_sha: sha, head_repository: { full_name: repo } };
@@ -45,6 +45,23 @@ test('artifact extraction rejects traversal and symlinks', () => {
     for (const name of ['../escaped', '/tmp/escaped', 'robbo/../../escaped', 'robbo/.git/config']) {
       execFileSync('python3', ['-c', 'import zipfile,sys; z=zipfile.ZipFile(sys.argv[1],"w"); z.writestr(sys.argv[2],"bad"); z.close()', path.join(temp, 'bad.zip'), name]);
       assert.throws(() => execFileSync('python3', ['scripts/release/extract-pages.py', path.join(temp, 'bad.zip'), path.join(temp, 'out')], { stdio: 'pipe' }));
+    }
+  } finally { fs.rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('publishing again resets the cache worktree to the SHA fetched in the parent repository', () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'robbo-git-pages-'));
+  try {
+    const repo = path.join(temp, 'repo'), remote = path.join(temp, 'remote.git'), tree = path.join(temp, 'tree');
+    fs.mkdirSync(repo);
+    const git = (...args) => execFileSync('git', args, { cwd: repo, stdio: 'pipe' });
+    execFileSync('git', ['init', '--bare', remote], { stdio: 'pipe' }); git('init');
+    git('config', 'user.name', 'Test'); git('config', 'user.email', 'test@example.invalid'); git('remote', 'add', 'origin', remote);
+    for (const value of ['first', 'second']) {
+      fs.writeFileSync(path.join(repo, 'index.html'), value); git('add', '.'); git('commit', '-m', value);
+      git('push', 'origin', 'HEAD:refs/heads/pages-site'); git('fetch', 'origin', 'pages-site');
+      checkoutCache(tree, true, repo);
+      assert.equal(fs.readFileSync(path.join(tree, 'index.html'), 'utf8'), value);
     }
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
