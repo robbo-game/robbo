@@ -1,5 +1,5 @@
 import type { SavedAttempt } from '../../application/saved-attempt';
-import { browserStorage, readRecord, type SafeStorage } from './storage';
+import { browserStorage, storageNamespace, readRecord, type SafeStorage } from './storage';
 
 const JOURNAL = 'robbo.attempt.backup.v1';
 /** IndexedDB is the main store; a synchronous journal protects the last hidden-page checkpoint. */
@@ -13,7 +13,7 @@ export class AttemptStore {
       const finish = () => { if (!finished) { finished = true; clearTimeout(timer); resolve(); } };
       const timer = setTimeout(finish, 1500);
       try {
-        const request = indexedDB.open('robbo-saves', 1);
+        const request = indexedDB.open(`robbo-saves${storageNamespace() ? '-' + storageNamespace() : ''}`, 1);
         request.onupgradeneeded = () => request.result.createObjectStore('attempts');
         request.onerror = finish; request.onblocked = finish;
         request.onsuccess = () => {

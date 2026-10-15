@@ -39,6 +39,7 @@ jobs:
       - run: node tests/browser/input.check.cjs
       - run: node tests/browser/session.check.cjs
       - run: node tests/browser/autosave.check.cjs
+      - run: node tests/browser/previews.check.cjs
       - run: node tests/browser/viewport.check.cjs
       - run: node tests/browser/artwork.check.cjs
       - run: node tests/browser/render-performance.check.cjs
@@ -80,16 +81,6 @@ jobs:
       - run: npm run package
       - run: cd release && zip -r robbo.zip robbo
 
-      - name: Configure GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v5
-
-      - name: Upload GitHub Pages artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: release/robbo
-
       - uses: actions/upload-artifact@v4
         with:
           name: robbo
@@ -117,14 +108,3 @@ jobs:
             gh release create "$release_tag" release/robbo.zip --target "$GITHUB_SHA" --title "Robbo $release_tag" --generate-notes --latest
           fi
 
-  deploy-pages:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

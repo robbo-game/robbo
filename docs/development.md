@@ -116,3 +116,22 @@ birds, bomb chains, teleportation and the death lifecycle.
 References: [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 provides asynchronous structured storage; [visibilitychange](https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event)
 is the lifecycle checkpoint used when a mobile page becomes hidden.
+
+## GitHub Pages and PR previews
+
+The production game stays at `https://sigmalko.github.io/robbo/`. Each successful
+same-repository PR build is available at `/robbo/previews/pr-N/`; the comparison
+index is `/robbo/previews/`. Preview navigation links back to main and the index.
+`version.json` in each slot identifies its built commit and PR.
+
+A trusted main-branch `workflow_run` publisher downloads the successful build's
+static ZIP, validates archive paths and updates only that slot on `pages-site`.
+Optimistic Git pushes retry against the current combined tree, preserving other
+slots. A serialized Pages deploy checks out the latest combined tree after
+obtaining its slot. Stale main/PR commits, closed PRs and fork builds cannot
+publish. No code from the downloaded PR artifact is executed by the publisher.
+
+Preview paths namespace localStorage and IndexedDB by PR number. Main retains
+its original storage keys, and testing different variants cannot overwrite its
+saved attempt, artwork or preferences. Old preview URLs are retained after PR
+closure so bookmarked comparisons remain available.

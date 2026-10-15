@@ -1,3 +1,4 @@
+import { browserStorage } from '../browser/persistence/storage';
 import { javaTheme, loadTheme, neonTheme, themes, validateTheme } from '../presentation/themes/theme';
 import { createModernAtlas, validateModernAtlas } from '../presentation/rendering/modern-art';
 import { createJourneyAtlas } from '../presentation/rendering/journey-art';
@@ -13,7 +14,8 @@ export function createThemeController(canvas: HTMLCanvasElement, themeSelector: 
   let themeRequest = 0;
   type ThemeAtlasLoader = (themeId: string) => Promise<CanvasImageSource>;
   let testThemeAtlasLoader: ThemeAtlasLoader | undefined;
-  function savedTheme(): string | null { try { return localStorage.getItem('robbo.artwork'); } catch { return null; } }
+  const storage = browserStorage();
+  function savedTheme(): string | null { try { return storage?.getItem('robbo.artwork') ?? null; } catch { return null; } }
   async function activateTheme(id: string): Promise<void> {
     const next = themes.find(theme => theme.id === id) ?? javaTheme;
     const request = ++themeRequest;
@@ -48,7 +50,7 @@ export function createThemeController(canvas: HTMLCanvasElement, themeSelector: 
       document.documentElement.dataset.artwork = next.id === javaTheme.id ? 'classic' : 'modern';
       document.documentElement.style.setProperty('--planet-colour', next.palette.background ?? '#111710');
       updateInventoryArtwork();
-      try { localStorage.setItem('robbo.artwork', next.id); } catch { /* Storage is optional. */ }
+      try { storage?.setItem('robbo.artwork', next.id); } catch { /* Storage is optional. */ }
     } catch (error) {
       if (request !== themeRequest) return;
       themeSelector.value = activeTheme.id;

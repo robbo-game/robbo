@@ -1,0 +1,59 @@
+name: Publish main and PR previews to Pages
+
+on:
+  workflow_run:
+    workflows: [Build and release Robbo]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: read
+    outputs:
+      publish: ${{ steps.stage.outputs.publish }}
+    steps:
+      # Execute only trusted main-branch tooling, never scripts from the PR artifact.
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24.x
+      - id: stage
+        run: node scripts/release/pages-preview.cjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  deploy:
+    needs: stage
+    if: needs.stage.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: robbo-pages-deploy
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Read the latest combined tree after obtaining the deployment slot.
+      # A newer queued deploy includes all published slots, even if a pending run is replaced.
+      - uses: actions/checkout@v5
+        with:
+          ref: pages-site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
