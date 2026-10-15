@@ -71,11 +71,20 @@ export async function startGame(): Promise<void> {
   const audio = new GameAudio(message => { element('audio-status').textContent = message; });
   const preferences = new PreferenceStore();
   const touchFireSide = element<HTMLSelectElement>('touch-fire-side');
+  const touchMovement = element<HTMLSelectElement>('touch-movement');
   function syncTouchLayout(): void {
     touchFireSide.value = preferences.current.touchFireSide;
+    touchMovement.value = preferences.current.touchMovement;
+    element('touch-movement-help').textContent = preferences.current.touchMovement === 'gestures'
+      ? 'Swipe briefly for one step. Drag farther and hold to keep moving. Lift or return to the starting point to stop.'
+      : 'Tap an arrow for one step. Hold to keep moving after a short delay. Slide between arrows to change direction; lift or slide to the centre to stop.';
+    document.documentElement.dataset.touchMovement = preferences.current.touchMovement;
     document.documentElement.dataset.touchFireSide = preferences.current.touchFireSide;
   }
   syncTouchLayout();
+  touchMovement.addEventListener('change', () => {
+    clearInput(); preferences.apply({ touchMovement: touchMovement.value === 'dpad' ? 'dpad' : 'gestures' }); syncTouchLayout();
+  });
   touchFireSide.addEventListener('change', () => {
     clearInput();
     preferences.apply({ touchFireSide: touchFireSide.value === 'left' ? 'left' : 'right' });
@@ -213,7 +222,7 @@ export async function startGame(): Promise<void> {
     }
     if (effects.holdingDeparture && session.world.status === 'won' && !session.paused) { clearInput(); render(); return; }
     pollInput();
-    const command = input.command();
+    const command = input.command(session.world.robot.direction);
     if (command && !session.paused && session.world.status === 'playing') replayAction({ type: 'command', direction: command.direction, fire: command.fire });
     const oldPlanet = session.planet, oldCompleted = session.completed;
     if (replay.recorder) { try { replay.recorder.step(); } catch (error) { replay.cancel(); element('audio-status').textContent = error instanceof Error ? error.message : 'Recording stopped'; } } else session.step();
@@ -265,6 +274,7 @@ export async function startGame(): Promise<void> {
   element<HTMLInputElement>('mute').addEventListener('change', event => { const muted = (event.target as HTMLInputElement).checked; audio.setMuted(muted); preferences.apply({ muted }); });
   element<HTMLInputElement>('volume').addEventListener('input', event => { const volume = Number((event.target as HTMLInputElement).value) / 100; audio.setVolume(volume); preferences.apply({ volume }); });
   const inputOptions = {
+    facing: () => session.world.robot.direction,
     command: (direction: Direction, fire: boolean) => replayAction({ type: 'command', direction, fire }),
     active: () => !replay.viewing && !session.paused && !effects.holdingArrival && session.world.status === 'playing',
     start: () => { if (!session.started) { session.start(); effects.arrive(session.world); render(); activateAudio(); } },

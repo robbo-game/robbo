@@ -63,7 +63,7 @@ async function main() {
         if (touch) {
           const reset = await page.locator('#restart').boundingBox();
           assert(reset && reset.width >= 48 && reset.height >= 48 && reset.y >= 0 && reset.y + reset.height <= height, 'Planet reset stays reachable in the top toolbar');
-          for (const box of await page.locator('.touch-controls button').evaluateAll(buttons => buttons.map(button => { const b = button.getBoundingClientRect(); return { x: b.x, y: b.y, width: b.width, height: b.height, bottom: b.bottom }; }))) {
+          for (const box of await page.locator('.touch-controls button:visible').evaluateAll(buttons => buttons.map(button => { const b = button.getBoundingClientRect(); return { x: b.x, y: b.y, width: b.width, height: b.height, bottom: b.bottom }; }))) {
             assert(box.width >= 48 && box.height >= 48, 'Touch targets must be at least 48 CSS pixels');
             assert(box.x >= 0 && box.y >= 0 && box.bottom <= height, 'Touch controls must remain on screen');
           }
