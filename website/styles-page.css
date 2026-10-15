@@ -133,3 +133,7 @@ html[data-touch-fire-side="left"] .touch-gesture { order: 2; }
   .touch-gesture { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: auto; }
   html[data-touch-fire-side="left"] .touch-gesture { left: auto; right: 10px; }
 }
+
+#back-to-game { display: block; margin-bottom: 16px; }
+.touch-preference { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 12px 0; }
+.touch-preference select { margin-left: 0; min-width: 0; }
