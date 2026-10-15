@@ -35,6 +35,16 @@ function installSite(tree, release, target) {
   });
   fs.writeFileSync(path.join(previews, 'index.html'), `<!doctype html><html lang="pl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Warianty Robbo</title><style>body{font:18px/1.6 system-ui;background:#111b13;color:#e6efdd;max-width:800px;margin:40px auto;padding:20px}a{color:#d3ff70}li{margin:22px 0}small{display:block;color:#9cae92;font-size:12px}</style><h1>Warianty Robbo</h1><p>Wybierz wersję do testowania. Każdy podgląd ma oddzielny zapis gry.</p><ul><li><a href="../">main — wersja główna</a></li>${entries.join('')}</ul></html>`);
 }
+function checkoutCache(tree, exists, repository = process.cwd()) {
+  // FETCH_HEAD is per-worktree. Resolve it in the fetching repository first.
+  const base = run('git', ['rev-parse', exists ? 'FETCH_HEAD' : 'HEAD'], { cwd: repository });
+  if (!fs.existsSync(tree)) run('git', ['worktree', 'add', '--detach', tree, base], { cwd: repository });
+  if (exists) run('git', ['-C', tree, 'reset', '--hard', base]);
+  else {
+    run('git', ['-C', tree, 'checkout', '--orphan', `pages-bootstrap-${Date.now()}`]);
+    for (const name of fs.readdirSync(tree)) if (name !== '.git') fs.rmSync(path.join(tree, name), { recursive: true, force: true });
+  }
+}
 function stage() {
   const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
   const repository = process.env.GITHUB_REPOSITORY;
@@ -52,12 +62,7 @@ function stage() {
   for (let attempt = 0; attempt < 6; attempt++) {
     let exists = true;
     try { run('git', ['fetch', 'origin', 'pages-site']); } catch { exists = false; }
-    if (!fs.existsSync(tree)) run('git', ['worktree', 'add', '--detach', tree, exists ? 'FETCH_HEAD' : 'HEAD']);
-    if (exists) run('git', ['-C', tree, 'reset', '--hard', 'FETCH_HEAD']);
-    else {
-      run('git', ['-C', tree, 'checkout', '--orphan', `pages-bootstrap-${Date.now()}`]);
-      for (const name of fs.readdirSync(tree)) if (name !== '.git') fs.rmSync(path.join(tree, name), { recursive: true, force: true });
-    }
+    checkoutCache(tree, exists);
     const current = targetForRun(build, repository, gh([`repos/${repository}/git/ref/heads/main`]).object.sha, gh([`repos/${repository}/pulls?state=open&per_page=100`]));
     if (!current) { fs.appendFileSync(process.env.GITHUB_OUTPUT, 'publish=false\n'); return; }
     installSite(tree, path.join(release, 'robbo'), current);
@@ -71,5 +76,5 @@ function stage() {
     } catch (error) { if (attempt === 5) throw error; }
   }
 }
-module.exports = { targetForRun, installSite };
+module.exports = { targetForRun, installSite, checkoutCache };
 if (require.main === module) stage();
