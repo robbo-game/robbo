@@ -17,19 +17,22 @@ export function attachTouch(input: ActionInput, options: {
   retry: () => void;
   active: () => boolean;
   start: () => void;
+  facing: () => Direction;
 }): { reset: () => void } {
   const state = new PointerActions(input);
-  const panel = document.createElement('section'); panel.className = 'touch-controls'; panel.setAttribute('aria-label', 'Touch game controls');
-  const description = document.createElement('p'); description.textContent = 'Hold or slide across the D-pad to move. Its centre stops movement. Hold Fire with your other thumb and a direction to shoot. Release the direction first to stop in place. Release Fire while holding a direction to move again.';
+  const REPEAT_DELAY = 280;
+  const defer = (id: number) => input.defer(`pointer:${id}`, performance.now() + REPEAT_DELAY);
+  const panel = document.createElement('section'); panel.className = 'touch-controls'; panel.dataset.touchVariant = 'precise-dpad'; panel.setAttribute('aria-label', 'Touch game controls');
+  const description = document.createElement('p'); description.textContent = 'Tap a direction for one step. Hold for 280 milliseconds to keep moving. Slide to change direction or return to the centre to stop. Tap Fire to shoot in the last direction; hold to repeat. Hold Fire and a direction to change aim without moving. Release the direction and then Fire to stop in place.';
   const pad = document.createElement('div'); pad.className = 'touch-dpad'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', 'Movement'); panel.append(pad);
   const buttons = new Map<Action, HTMLButtonElement>();
   const captures = new Map<number, HTMLButtonElement>();
   const refresh = () => { for (const [action, button] of buttons) button.setAttribute('aria-pressed', String([...state.pointers.values()].includes(action))); };
-  const command = () => { const action = input.command(); if (action && options.active()) options.command(action.direction, action.fire); };
+  const command = () => { const action = input.command(options.facing()); if (action && options.active()) options.command(action.direction, action.fire); };
   const release = (id: number) => { state.release(id); captures.delete(id); refresh(); };
   for (const action of ['up', 'left', 'down', 'right', 'fire'] as const) {
     const button = document.createElement('button'); button.type = 'button'; button.dataset.action = action;
-    button.setAttribute('aria-label', action === 'fire' ? 'Fire (hold while aiming)' : `Move ${action}`);
+    button.setAttribute('aria-label', action === 'fire' ? 'Fire in the last direction (hold to repeat)' : `Move ${action}`);
     button.setAttribute('aria-pressed', 'false');
     // SVG geometry avoids platform-specific font baselines and fallback glyph sizes.
     const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -45,14 +48,14 @@ export function attachTouch(input: ActionInput, options: {
       if (event.button !== 0) return;
       event.preventDefault(); options.start(); if (!options.active()) return;
       state.press(event.pointerId, action); captures.set(event.pointerId, button); button.setPointerCapture(event.pointerId); refresh();
-      if (action !== 'fire') command();
+      command(); if (action !== 'fire') defer(event.pointerId);
     });
     button.addEventListener('pointermove', event => {
       if (action === 'fire' || !captures.has(event.pointerId) || !options.active()) return;
       const box = pad.getBoundingClientRect();
       const next = directionAt(event.clientX - box.left, event.clientY - box.top, box.width);
       if (state.pointers.get(event.pointerId) === next) return;
-      if (next) { state.press(event.pointerId, next); command(); } else state.release(event.pointerId);
+      if (next) { state.press(event.pointerId, next); command(); defer(event.pointerId); } else state.release(event.pointerId);
       refresh();
     });
     for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(name, event => release((event as PointerEvent).pointerId));
@@ -64,7 +67,7 @@ export function attachTouch(input: ActionInput, options: {
     });
     button.addEventListener('keydown', event => {
       if (action !== 'fire' || (event.key !== ' ' && event.key !== 'Enter')) return;
-      event.preventDefault(); if (!event.repeat && options.active()) { state.press(-2, action); refresh(); }
+      event.preventDefault(); options.start(); if (!event.repeat && options.active()) { state.press(-2, action); command(); refresh(); }
     });
     button.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Enter') release(-2); });
     button.addEventListener('blur', () => release(-2));

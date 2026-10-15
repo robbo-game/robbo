@@ -213,7 +213,7 @@ export async function startGame(): Promise<void> {
     }
     if (effects.holdingDeparture && session.world.status === 'won' && !session.paused) { clearInput(); render(); return; }
     pollInput();
-    const command = input.command();
+    const command = input.command(session.world.robot.direction);
     if (command && !session.paused && session.world.status === 'playing') replayAction({ type: 'command', direction: command.direction, fire: command.fire });
     const oldPlanet = session.planet, oldCompleted = session.completed;
     if (replay.recorder) { try { replay.recorder.step(); } catch (error) { replay.cancel(); element('audio-status').textContent = error instanceof Error ? error.message : 'Recording stopped'; } } else session.step();
@@ -265,6 +265,7 @@ export async function startGame(): Promise<void> {
   element<HTMLInputElement>('mute').addEventListener('change', event => { const muted = (event.target as HTMLInputElement).checked; audio.setMuted(muted); preferences.apply({ muted }); });
   element<HTMLInputElement>('volume').addEventListener('input', event => { const volume = Number((event.target as HTMLInputElement).value) / 100; audio.setVolume(volume); preferences.apply({ volume }); });
   const inputOptions = {
+    facing: () => session.world.robot.direction,
     command: (direction: Direction, fire: boolean) => replayAction({ type: 'command', direction, fire }),
     active: () => !replay.viewing && !session.paused && !effects.holdingArrival && session.world.status === 'playing',
     start: () => { if (!session.started) { session.start(); effects.arrive(session.world); render(); activateAudio(); } },

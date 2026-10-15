@@ -1,14 +1,15 @@
 # Mobile controls
 
-Robbo moves on a four-direction grid. A fixed D-pad under the left thumb and a
-separate momentary fire button under the right thumb replace the old row of
-labelled buttons. Settings → Touch layout lets players swap the two controls,
-putting Fire under either thumb. The choice persists in the existing preferences
-record; old records default to Fire on the right. Reset preferences restores that
-default. Changing sides clears held inputs. Hold a direction to repeat movement, or slide the same finger
-to turn. The centre and the area outside the pad release movement. Hold Fire
-and aim to shoot; releasing Fire resumes movement. To stop shooting without moving, release the direction
-first. Fire alone neither fires nor selects a direction. There are no diagonal moves.
+Robbo moves on a four-direction grid. Tap a D-pad direction for exactly one step.
+Holding it repeats movement after 280 ms; sliding selects a new direction and
+restarts that delay. Returning to the centre or lifting releases movement.
+The latest held direction wins and there are no diagonal commands.
+
+Tap Fire to shoot in Robbo's last facing direction, or hold it to repeat.
+Holding Fire and a direction changes aim while Robbo remains still. To stop
+in place, release the direction and then Fire; if a direction remains held
+after Fire releases, movement can resume. Settings → Touch layout swaps the
+movement and Fire zones and remembers the choice.
 
 Portrait reserves a control deck below the board. Landscape phones reserve side
 rails, keeping both thumbs off the game tiles. The camera still follows Robbo at
