@@ -1,7 +1,7 @@
 import { ENGINE_VERSION } from '../engine/rules-version';
 import { GameSession } from './game-session';
 import type { Direction, Pack } from '../engine/model';
-// Bird adjacency changes simulation outcomes; reject recordings of the old engine.
+// Rule changes alter simulation outcomes; reject recordings of older engines.
 export const REPLAY_ENGINE = ENGINE_VERSION;
 const MAX_FRAMES = 100000, MAX_ACTIONS = 32;
 export type ReplayAction = { type: 'command'; direction: Direction; fire: boolean; aimOnly?: boolean } | { type: 'pause' | 'restart' | 'retry' | 'start' };

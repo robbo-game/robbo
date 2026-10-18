@@ -4,7 +4,7 @@ import { inverse, kindSymbols, symbolKinds, vectors } from './model';
 import type { Command, Direction, Entity, GameEvent, Kind, LevelData, SoundName } from './model';
 
 export const shotTargets = new Set<Kind>(['robot', 'bear', 'worm', 'bird', 'eyes', 'river', 'bomb', 'question', 'sand', 'ammo']);
-export const blastTargets = new Set<Kind>([...shotTargets, 'box', 'screw', 'key', 'ship', 'stop', 'shot', 'flame', 'beam']);
+export const blastTargets = new Set<Kind>([...shotTargets, 'box', 'screw', 'key', 'door', 'ship', 'stop', 'shot', 'flame', 'beam']);
 export const riverTargets = new Set<Kind>(['robot', 'shot', 'flame', 'beam', 'smoke', 'impact', 'blast', 'question', 'screw', 'cannon', 'bird', 'worm', 'bear', 'eyes', 'bomb', 'momentum', 'box', 'key', 'ship', 'ammo', 'sand', 'stop']);
 const pushable = new Set<Kind>(['box', 'momentum', 'bomb', 'question', 'ship', 'cannon']);
 const questionPool: Kind[] = ['river', 'bomb', 'question', 'screw', 'magnet', 'key', 'sand', 'box', 'momentum', 'eyes', 'bird', 'ammo', 'bear', 'worm', 'cannon'];

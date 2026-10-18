@@ -90,6 +90,7 @@ describe('Full saved attempts', () => {
     const { session, pack } = fixture(['R..', '...']);
     const saved = saveAttempt(session);
     expect(() => restoreAttempt({ ...saved, engine: 'old' }, [pack])).toThrow('Incompatible');
+    expect(() => restoreAttempt({ ...saved, engine: 'robbo-java-2' }, [pack])).toThrow('Incompatible');
     expect(() => restoreAttempt({ ...saved, packHash: 'changed' }, [pack])).toThrow('Incompatible');
     expect(() => restoreAttempt({ ...saved, randomState: -1 }, [pack])).toThrow('Invalid');
     const duplicate = structuredClone(saved); duplicate.world.entities.push({ ...duplicate.world.robot });

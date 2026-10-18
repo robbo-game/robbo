@@ -8,7 +8,7 @@ const attacks = ['shot', 'blast', 'river', 'momentum'] as const;
 const expected = {
   shot: 'robot bear worm bird eyes river bomb question sand ammo',
   momentum: 'robot bear worm bird eyes river bomb question sand ammo',
-  blast: 'robot bear worm bird eyes river bomb question sand ammo box screw key ship stop shot flame beam',
+  blast: 'robot bear worm bird eyes river bomb question sand ammo box screw key door ship stop shot flame beam',
   river: 'robot shot flame beam smoke impact blast question screw cannon bird worm bear eyes bomb momentum box key ship ammo sand stop'
 };
 describe('Attack/target interaction matrix', () => {

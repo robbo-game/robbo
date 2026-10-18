@@ -67,12 +67,17 @@ optionally selects a Chromium executable.
 
 ## Replay compatibility
 
-Engine `robbo-java-2` corrects bird contact: cardinal adjacency is lethal,
+Engine `robbo-java-3` allows bomb blasts to destroy doors, matching GNU Robbo
+and unblocking the lower door on planet 12 without a second key. Shots still
+cannot destroy doors. Historical campaign maps remain unchanged.
+
+Engine `robbo-java-2` corrected bird contact: cardinal adjacency is lethal,
 including when either Robbo or a bird moves into a neighbouring cell. Diagonals
 do not count. The existing teleport materialization grace period is unchanged.
 
-Recordings from `robbo-java-1` are rejected at import because their movement and
-death checkpoints can differ. Keep an old build to view those recordings; record
+Recordings and saved attempts from `robbo-java-1` and `robbo-java-2` are rejected
+because their simulation checkpoints can differ. Incompatible saved attempts
+fall back to the selected planet. Keep an old build to view those recordings; record
 new runs with the current build. Changing the engine field in an old recording
 is not a valid migration. Campaign progress and preference storage are unchanged.
 
