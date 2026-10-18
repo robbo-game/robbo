@@ -1,5 +1,7 @@
 # Documentation
 
+- [Robbo — krótka instrukcja gracza (PL)](player-guide.md)
+
 - [Development, local play and validation](development.md)
 - [Contributing](../CONTRIBUTING.md)
 - [Mobile controls, gestures and design references](mobile-controls.md)
