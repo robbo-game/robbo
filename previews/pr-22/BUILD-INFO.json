@@ -1,0 +1,12 @@
+{
+  "tag": "pr-22-95386ffbf662bea855d895d5ad121bf68f55403a",
+  "title": "Robbo PR #22 · docs/player-guide · 95386ffbf662",
+  "prerelease": true,
+  "sha": "95386ffbf662bea855d895d5ad121bf68f55403a",
+  "pr": 22,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/22",
+  "branch": "docs/player-guide",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/docs%2Fplayer-guide",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/95386ffbf662bea855d895d5ad121bf68f55403a",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/22\n- Branch: [docs/player-guide](https://github.com/sigmalko/robbo/tree/docs%2Fplayer-guide)\n- Built commit: https://github.com/sigmalko/robbo/commit/95386ffbf662bea855d895d5ad121bf68f55403a\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
