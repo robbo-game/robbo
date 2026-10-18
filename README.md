@@ -47,6 +47,8 @@ replays for sharing or investigating a run.
 
 ## Documentation
 
+[Krótka instrukcja gracza (PL)](docs/player-guide.md) opisuje ruch, celowanie i strzelanie.
+
 Technical material lives in the [documentation index](docs/README.md):
 [local play, builds and validation](docs/development.md),
 [architecture](docs/architecture.md),
