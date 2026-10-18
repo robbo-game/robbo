@@ -13,7 +13,7 @@ export class PointerActions {
 }
 
 export function attachTouch(input: ActionInput, options: {
-  command: (direction: Direction, fire: boolean) => void;
+  command: (direction: Direction, fire: boolean, aimOnly?: boolean) => void;
   pause: () => void;
   retry: () => void;
   active: () => boolean;
@@ -24,36 +24,37 @@ export function attachTouch(input: ActionInput, options: {
   const REPEAT_DELAY = 280;
   const defer = (id: number) => input.defer(`pointer:${id}`, performance.now() + REPEAT_DELAY);
   const panel = document.createElement('section'); panel.className = 'touch-controls'; panel.dataset.touchVariant = 'configurable'; panel.setAttribute('aria-label', 'Touch game controls');
-  const description = document.createElement('p'); description.textContent = 'Choose D-pad buttons or swipe gestures in Settings. D-pad: tap for one step, hold to repeat. Short swipe: one step. Drag farther and keep your thumb down for continuous movement. Return to the start point or lift to stop. Choose D-pad in Settings for button controls. Tap Fire to shoot in the last direction; hold to repeat. Hold Fire and a direction to change aim without moving. Release the direction and then Fire to stop in place.';
+  const description = document.createElement('p'); description.textContent = 'Choose D-pad buttons or swipe gestures in Settings. D-pad: tap for one step, hold to repeat. Short swipe: one step. Drag farther and keep your thumb down for continuous movement. Return to the start point or lift to stop. Choose D-pad in Settings for button controls. Tap Fire once per shot; holding never repeats. Hold AIM and choose a direction to turn without moving or firing. Hold Fire and a direction to change aim without another shot. Release the direction and then Fire to stop in place.';
   const pad = document.createElement('div'); pad.className = 'touch-dpad'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', 'Movement'); panel.append(pad);
+  const actions = document.createElement('div'); actions.className = 'touch-actions'; panel.append(actions);
   const buttons = new Map<Action, HTMLButtonElement>();
   const captures = new Map<number, HTMLElement>();
   const gestures = new Map<number, { x: number; y: number; direction?: Action; continuous: boolean }>();
   const refresh = () => { for (const [action, button] of buttons) button.setAttribute('aria-pressed', String([...state.pointers.values()].includes(action))); };
-  const command = () => { const action = input.command(options.facing()); if (action && options.active()) options.command(action.direction, action.fire); };
+  const command = () => { const action = input.command(options.facing()); if (action && options.active()) options.command(action.direction, action.fire, action.aimOnly); };
   const release = (id: number) => { state.release(id); captures.delete(id); gestures.delete(id); refresh(); };
-  for (const action of ['up', 'left', 'down', 'right', 'fire'] as const) {
+  for (const action of ['up', 'left', 'down', 'right', 'fire', 'aim'] as const) {
     const button = document.createElement('button'); button.type = 'button'; button.dataset.action = action;
-    button.setAttribute('aria-label', action === 'fire' ? 'Fire in the last direction (hold to repeat)' : `Move ${action}`);
+    button.setAttribute('aria-label', action === 'fire' ? 'Fire once in the selected direction' : action === 'aim' ? 'Hold to aim without moving or firing' : `Move ${action}`);
     button.setAttribute('aria-pressed', 'false');
     // SVG geometry avoids platform-specific font baselines and fallback glyph sizes.
     const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     icon.setAttribute('viewBox', '0 0 32 32'); icon.setAttribute('aria-hidden', 'true'); icon.setAttribute('focusable', 'false');
-    if (action === 'fire') {
+    if (action === 'fire' || action === 'aim') {
       icon.innerHTML = '<circle cx="16" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="3" fill="currentColor"/><path d="M16 2v6m0 16v6M2 16h6m16 0h6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>';
     } else {
       icon.innerHTML = '<path d="M16 4 28 17h-8v11h-8V17H4Z" fill="currentColor"/>';
     }
     button.append(icon);
-    if (action === 'fire') { const label = document.createElement('span'); label.textContent = 'FIRE'; button.append(label); }
+    if (action === 'fire' || action === 'aim') { const label = document.createElement('span'); label.textContent = action === 'fire' ? 'FIRE' : 'AIM'; button.append(label); }
     button.addEventListener('pointerdown', event => {
       if (event.button !== 0) return;
       event.preventDefault(); options.start(); if (!options.active()) return;
       state.press(event.pointerId, action); captures.set(event.pointerId, button); button.setPointerCapture(event.pointerId); refresh();
-      command(); if (action !== 'fire') defer(event.pointerId);
+      command(); if (action !== 'fire' && action !== 'aim') defer(event.pointerId);
     });
     button.addEventListener('pointermove', event => {
-      if (action === 'fire' || !captures.has(event.pointerId) || !options.active()) return;
+      if (action === 'fire' || action === 'aim' || !captures.has(event.pointerId) || !options.active()) return;
       const box = pad.getBoundingClientRect();
       const next = directionAt(event.clientX - box.left, event.clientY - box.top, box.width);
       if (state.pointers.get(event.pointerId) === next) return;
@@ -63,17 +64,17 @@ export function attachTouch(input: ActionInput, options: {
     for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(name, event => release((event as PointerEvent).pointerId));
     // Native activation provides a single step for keyboard/assistive technology.
     button.addEventListener('click', event => {
-      if (event.detail !== 0 || action === 'fire') return;
+      if (event.detail !== 0 || action === 'fire' || action === 'aim') return;
       options.start(); if (!options.active()) return;
       state.press(-1, action); command(); release(-1);
     });
     button.addEventListener('keydown', event => {
-      if (action !== 'fire' || (event.key !== ' ' && event.key !== 'Enter')) return;
+      if ((action !== 'fire' && action !== 'aim') || (event.key !== ' ' && event.key !== 'Enter')) return;
       event.preventDefault(); options.start(); if (!event.repeat && options.active()) { state.press(-2, action); command(); refresh(); }
     });
     button.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Enter') release(-2); });
     button.addEventListener('blur', () => release(-2));
-    buttons.set(action, button); (action === 'fire' ? panel : pad).append(button);
+    buttons.set(action, button); (action === 'fire' || action === 'aim' ? actions : pad).append(button);
   }
   const surface = document.createElement('div'); surface.className = 'touch-gesture'; surface.tabIndex = 0;
   surface.setAttribute('role', 'group'); surface.setAttribute('aria-label', 'Swipe to move. Short swipe: one step. Drag farther and hold: keep moving.');

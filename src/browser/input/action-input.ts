@@ -1,43 +1,57 @@
-import type { Direction } from '../../engine/model';
+import type { Command, Direction } from '../../engine/model';
 
-export type Action = 'right' | 'down' | 'left' | 'up' | 'fire' | 'pause' | 'retry';
-export const defaultBindings: Record<Action, string> = { right: 'ArrowRight', down: 'ArrowDown', left: 'ArrowLeft', up: 'ArrowUp', fire: 'Control', pause: 'p', retry: 'r' };
+export type Action = 'right' | 'down' | 'left' | 'up' | 'fire' | 'aim' | 'pause' | 'retry';
+export const defaultBindings: Record<Action, string> = { right: 'ArrowRight', down: 'ArrowDown', left: 'ArrowLeft', up: 'ArrowUp', fire: 'Control', aim: 'Shift', pause: 'p', retry: 'r' };
 const directions: Partial<Record<Action, Direction>> = { right: 0, down: 1, left: 2, up: 3 };
 
 /** One ordered action stream; newest held direction wins, never diagonals. */
 export class ActionInput {
   private readonly blocked = new Set<string>();
-  private touchAim?: Direction;
+  private shotPending = false;
   private readonly repeatAfter = new Map<string, number>();
   defer(source: string, until: number): void { this.repeatAfter.set(source, until); }
   readonly held = new Map<string, Action>();
   bindings = { ...defaultBindings };
   deadzone = 0.25;
-  padBindings: Record<Action, number> = { right: 15, down: 13, left: 14, up: 12, fire: 0, pause: 9, retry: 3 };
+  padBindings: Record<Action, number> = { right: 15, down: 13, left: 14, up: 12, fire: 0, aim: 1, pause: 9, retry: 3 };
   bindPad(action: Action, button: number): string | undefined {
     if (!Number.isInteger(button) || button < 0 || button > 31) return 'Choose a gamepad button between 0 and 31.';
     if (Object.entries(this.padBindings).some(([a, b]) => a !== action && b === button)) return 'This button is already assigned to another action.';
     this.padBindings[action] = button; this.release('pad:'); return undefined;
   }
   set(source: string, action: Action, pressed: boolean): boolean {
-    if (!pressed) { this.repeatAfter.delete(source); this.held.delete(source); this.blocked.delete(source); return false; }
+    if (!pressed) {
+      this.repeatAfter.delete(source); this.held.delete(source); this.blocked.delete(source);
+      if (![...this.held.values()].includes('fire')) this.shotPending = false;
+      return false;
+    }
     if (this.blocked.has(source)) return false;
     if (this.held.get(source) === action) return false;
-    if (directions[action] !== undefined) this.touchAim = source.startsWith('pointer:') ? directions[action] : undefined;
+    if (action === 'fire' && ![...this.held.values()].includes('fire')) this.shotPending = true;
     this.held.delete(source); this.held.set(source, action); return true;
   }
-  release(prefix = ''): void { if (!prefix || prefix === 'pointer:') this.touchAim = undefined; for (const source of this.held.keys()) if (source.startsWith(prefix)) { this.blocked.add(source); this.held.delete(source); this.repeatAfter.delete(source); } }
-  command(facing?: Direction, now = performance.now()): { direction: Direction; fire: boolean } | undefined {
+  release(prefix = ''): void {
+    for (const source of this.held.keys()) if (source.startsWith(prefix)) {
+      this.blocked.add(source); this.held.delete(source); this.repeatAfter.delete(source);
+    }
+    if (![...this.held.values()].includes('fire')) this.shotPending = false;
+  }
+  command(facing?: Direction, now = performance.now()): Command | undefined {
     const held = [...this.held.entries()].reverse();
     const aimed = held.find(([, action]) => directions[action] !== undefined);
-    const fire = held.some(([, action]) => action === 'fire');
-    if (aimed) {
-      if (!fire && now < (this.repeatAfter.get(aimed[0]) ?? 0)) return;
-      return { direction: directions[aimed[1]]!, fire };
+    const firing = held.some(([, action]) => action === 'fire');
+    const stationary = firing || held.some(([, action]) => action === 'aim');
+    // Keyboard keeps Ctrl + direction; touch and gamepad can fire at current facing.
+    const standalone = held.some(([source, action]) => action === 'fire' && !source.startsWith('key:'));
+    const direction = aimed ? directions[aimed[1]]! : standalone ? facing : undefined;
+    if (direction === undefined) return;
+    if (firing && this.shotPending) {
+      this.shotPending = false;
+      return { direction, fire: true };
     }
-    // A touch Fire button shoots where Robbo is facing; keyboard/gamepad semantics stay stable.
-    if (facing !== undefined && held.some(([source, action]) => source.startsWith('pointer:') && action === 'fire')) return { direction: this.touchAim ?? facing, fire: true };
-    return;
+    if (stationary) return aimed ? { direction, fire: false, aimOnly: true } : undefined;
+    if (!aimed || now < (this.repeatAfter.get(aimed[0]) ?? 0)) return;
+    return { direction, fire: false };
   }
   bind(action: Action, key: string): string | undefined {
     key = key.length === 1 ? key.toLowerCase() : key;
@@ -59,7 +73,8 @@ export class ActionInput {
 }
 
 export function attachInput(input: ActionInput, options: {
-  command: (direction: Direction, fire: boolean) => void;
+  command: (direction: Direction, fire: boolean, aimOnly?: boolean) => void;
+  facing: () => Direction;
   pause: () => void;
   retry: () => void;
   active: () => boolean;
@@ -77,14 +92,14 @@ export function attachInput(input: ActionInput, options: {
     if (!input.set(`key:${key}`, action, true)) return;
     if (action === 'pause') options.pause();
     else if (action === 'retry') options.retry();
-    else if (directions[action] !== undefined) {
-      options.start(); const command = input.command();
-      if (command && options.active()) options.command(command.direction, command.fire);
+    else if (directions[action] !== undefined || action === 'fire' || action === 'aim') {
+      options.start(); const command = input.command(options.facing());
+      if (command && options.active()) options.command(command.direction, command.fire, command.aimOnly);
     }
   });
   addEventListener('keyup', event => input.set(`key:${event.key.length === 1 ? event.key.toLowerCase() : event.key}`, 'fire', false));
   addEventListener('gamepaddisconnected', () => input.release('pad:'));
-  const panel = document.createElement('details'); panel.className = 'input-settings'; panel.innerHTML = '<summary>Input settings</summary><p>Newest held direction wins. Hold fire while aiming. Gamepad: left stick/D-pad, A fire, Start pause, Y retry.</p>';
+  const panel = document.createElement('details'); panel.className = 'input-settings'; panel.innerHTML = '<summary>Input settings</summary><p>Newest held direction wins. Press Fire once per shot; holding never repeats. Hold Shift (Aim) and a direction to turn without moving or firing. Gamepad: left stick/D-pad, A fire, B aim, Start pause, Y retry.</p>';
   const status = document.createElement('p'); status.setAttribute('role', 'status');
   for (const action of Object.keys(defaultBindings) as Action[]) {
     const label = document.createElement('label'); label.textContent = `${action}: `;

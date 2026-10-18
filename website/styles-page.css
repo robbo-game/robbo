@@ -70,7 +70,10 @@ details { border-top: 1px solid #364330; padding-top: 14px; font-size: 13px; lin
 /* A dedicated thumb area keeps fingers off the board. */
 .touch-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; flex: none; align-items: center; justify-items: center; padding: 12px 8px 16px; background: linear-gradient(#172318, #101910); border-top: 1px solid #3d5034; }
 html[data-touch-fire-side="left"] .touch-dpad { order: 2; }
-html[data-touch-fire-side="left"] .touch-controls [data-action="fire"] { order: 1; }
+html[data-touch-fire-side="left"] .touch-actions { order: 1; }
+.touch-actions { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.touch-controls [data-action="aim"] { width: 96px; height: 48px; flex-direction: row; gap: 6px; font-weight: 800; }
+.touch-controls [data-action="aim"] svg { width: 24px; height: 24px; }
 .touch-dpad { --pad-cell: clamp(48px, 13.33vw, 52px); display: grid; grid-template: repeat(3, var(--pad-cell)) / repeat(3, var(--pad-cell)); border-radius: 50%; background: radial-gradient(circle, #34432c 0%, #202d1e 65%, #192418 100%); touch-action: none; }
 .touch-controls button { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 48px; min-height: 48px; padding: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; border-radius: 15px; background: linear-gradient(#35472e, #253421); border: 1px solid #718960; color: #edf8df; box-shadow: inset 0 1px 0 #d9efbd20, 0 3px 0 #080e08; }
 .touch-controls svg { display: block; width: 32px; height: 32px; flex: none; pointer-events: none; }
@@ -98,11 +101,11 @@ html[data-touch-fire-side="left"] .touch-controls [data-action="fire"] { order: 
   .game { position: relative; padding: 0 116px 0 176px; }
   .touch-controls { position: absolute; inset: 0; padding: 0; background: transparent; border: 0; pointer-events: none; }
   .touch-dpad { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
-  .touch-controls [data-action="fire"] { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
+  .touch-actions { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
   .touch-controls button { pointer-events: auto; }
   html[data-touch-fire-side="left"] .game { padding-left: 116px; padding-right: 176px; }
   html[data-touch-fire-side="left"] .touch-dpad { left: auto; right: 10px; }
-  html[data-touch-fire-side="left"] .touch-controls [data-action="fire"] { right: auto; left: 14px; }
+  html[data-touch-fire-side="left"] .touch-actions { right: auto; left: 14px; }
 }
 
 .input-settings label { display: inline-block; margin: .5rem; }

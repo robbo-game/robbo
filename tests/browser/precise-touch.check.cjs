@@ -31,11 +31,12 @@ const { chromium } = require('playwright');
     assert.equal(state.ammo, 8); assert.deepEqual(state.robot, [4, 4]);
     assert(state.entities.some(e => e.kind === 'shot' && e.direction === 1), 'One-thumb Fire uses the last facing direction');
     await page.evaluate(() => window.robboTest.step(2)); assert.equal((await page.evaluate(() => window.robboTest.snapshot())).ammo, 8);
-    await load(); const aim = { ...right, id: 2 };
-    await touch('touchStart', [fire]); await touch('touchStart', [fire, aim]);
+    await load(); const direction = { ...right, id: 2 }, aim = await point('aim');
+    await touch('touchStart', [aim]); await touch('touchStart', [aim, direction]);
     await touch('touchEnd', [aim]); await page.evaluate(() => window.robboTest.step());
     state = await page.evaluate(() => window.robboTest.snapshot());
-    assert(state.entities.some(e => e.kind === 'shot' && e.direction === 0), 'A quick aiming tap survives release before the simulation tick');
+    assert.equal(state.entities.find(e => e.kind === 'robot').direction, 0, 'A quick aiming tap survives release before the simulation tick');
+    assert.equal(state.ammo, 9); assert.deepEqual(state.robot, [4, 4]);
     await touch('touchEnd', []);
     console.log('Precise touch passed: one step per short press, delayed repeat, release/cancel and one-thumb Fire.');
   } finally { await browser.close(); }
