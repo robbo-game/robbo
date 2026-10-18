@@ -113,7 +113,8 @@ export async function startGame(): Promise<void> {
     }
   }
   refreshPlanets();
-  function clearInput(): void { input.release(); touchControls?.reset(); session.world.clearInput(); }
+  let inputShotQueued = false;
+  function clearInput(): void { inputShotQueued = false; input.release(); touchControls?.reset(); session.world.clearInput(); }
   function activateAudio(): void {
     element('audio-status').textContent = '';
     const events = session.world.drainEvents(); effects.consume(events, session.world); audio.unlock(events);
@@ -201,7 +202,7 @@ export async function startGame(): Promise<void> {
   const replay = replayControls(packs, () => session, value => { session = value; generation = -1; clearInput(); audio.stop(); render(); });
   function replayAction(action: ReplayAction): void {
     if (replay.recorder) { try { replay.recorder.action(action); } catch (error) { replay.cancel(); element('audio-status').textContent = error instanceof Error ? error.message : 'Recording stopped'; replayAction(action); } }
-    else if (action.type === 'command') session.command(action.direction, action.fire);
+    else if (action.type === 'command') session.command(action.direction, action.fire, action.aimOnly);
     else if (action.type === 'pause') session.togglePause();
     else if (action.type === 'restart') session.restart();
     else if (action.type === 'retry') session.retry();
@@ -211,6 +212,13 @@ export async function startGame(): Promise<void> {
     if (replay.viewing) replay.cancel();
     replayAction({ type: session.world.status === 'won' ? 'restart' : 'retry' }); clearInput();
     if (session.world.status === 'dead') camera.returnToStart(session.world, reducedMotion.matches);
+  }
+  function inputCommand(direction: Direction, fire: boolean, aimOnly?: boolean): void {
+    // A press event can arrive between ticks. Preserve its shot until the next step,
+    // even if the player releases Fire or changes aim before the polling pass.
+    if (inputShotQueued) return;
+    replayAction({ type: 'command', direction, fire, ...(aimOnly ? { aimOnly } : {}) });
+    if (fire) inputShotQueued = true;
   }
   function advance(): void {
     if (replay.viewing) return;
@@ -223,7 +231,8 @@ export async function startGame(): Promise<void> {
     if (effects.holdingDeparture && session.world.status === 'won' && !session.paused) { clearInput(); render(); return; }
     pollInput();
     const command = input.command(session.world.robot.direction);
-    if (command && !session.paused && session.world.status === 'playing') replayAction({ type: 'command', direction: command.direction, fire: command.fire });
+    if (command && !session.paused && session.world.status === 'playing') inputCommand(command.direction, command.fire, command.aimOnly);
+    inputShotQueued = false;
     const oldPlanet = session.planet, oldCompleted = session.completed;
     if (replay.recorder) { try { replay.recorder.step(); } catch (error) { replay.cancel(); element('audio-status').textContent = error instanceof Error ? error.message : 'Recording stopped'; } } else session.step();
     if (location.hash !== '#test' && (oldPlanet !== session.planet || oldCompleted !== session.completed)) progress.advance(session.pack.id, session.planet, session.completed);
@@ -275,7 +284,7 @@ export async function startGame(): Promise<void> {
   element<HTMLInputElement>('volume').addEventListener('input', event => { const volume = Number((event.target as HTMLInputElement).value) / 100; audio.setVolume(volume); preferences.apply({ volume }); });
   const inputOptions = {
     facing: () => session.world.robot.direction,
-    command: (direction: Direction, fire: boolean) => replayAction({ type: 'command', direction, fire }),
+    command: inputCommand,
     active: () => !replay.viewing && !session.paused && !effects.holdingArrival && session.world.status === 'playing',
     start: () => { if (!session.started) { session.start(); effects.arrive(session.world); render(); activateAudio(); } },
     pause: pauseOrResume,

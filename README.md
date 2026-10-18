@@ -22,8 +22,13 @@ supports keyboard, gamepad and touch controls, as well as deterministic
 replays for sharing or investigating a run.
 
 <p align="center">
-  <strong>↑ ← ↓ →</strong> move &nbsp;·&nbsp; <strong>Ctrl + arrow</strong> fire &nbsp;·&nbsp; <strong>R</strong> retry &nbsp;·&nbsp; <strong>P</strong> pause
+  <strong>↑ ← ↓ →</strong> move &nbsp;·&nbsp; <strong>Ctrl + arrow</strong> fire once &nbsp;·&nbsp; <strong>Shift + arrow</strong> aim &nbsp;·&nbsp; <strong>R</strong> retry &nbsp;·&nbsp; <strong>P</strong> pause
 </p>
+
+Fire uses one round per press; release Fire before shooting again. Hold Shift
+(or gamepad B / touch AIM) and choose a direction to turn in place without firing.
+On touch, aim first and then tap FIRE; on gamepad use B + direction, then A.
+Holding Fire also keeps Robbo stationary while changing direction.
 
 ## Four worlds, four moods
 

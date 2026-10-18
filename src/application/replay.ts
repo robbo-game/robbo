@@ -4,7 +4,7 @@ import type { Direction, Pack } from '../engine/model';
 // Bird adjacency changes simulation outcomes; reject recordings of the old engine.
 export const REPLAY_ENGINE = ENGINE_VERSION;
 const MAX_FRAMES = 100000, MAX_ACTIONS = 32;
-export type ReplayAction = { type: 'command'; direction: Direction; fire: boolean } | { type: 'pause' | 'restart' | 'retry' | 'start' };
+export type ReplayAction = { type: 'command'; direction: Direction; fire: boolean; aimOnly?: boolean } | { type: 'pause' | 'restart' | 'retry' | 'start' };
 interface Frame { tick: number; actions: ReplayAction[]; checkpoint: string; events: string }
 export interface Replay { version: 1; engine: string; rules: string; pack: string; packHash: string; planet: number; seed: number; frames: Frame[] }
 export function digest(value: unknown): string {
@@ -43,7 +43,7 @@ export class ReplayRecorder {
   export(): string { return JSON.stringify(this.data); }
 }
 function applyAction(session: GameSession, action: ReplayAction): void {
-  if (action.type === 'command') session.command(action.direction, action.fire);
+  if (action.type === 'command') session.command(action.direction, action.fire, action.aimOnly);
   else if (action.type === 'pause') session.togglePause();
   else if (action.type === 'restart') session.restart();
   else if (action.type === 'retry') session.retry();
@@ -61,7 +61,7 @@ export function playReplay(text: string, packs: Pack[]): GameSession {
     session.world.drainEvents();
     for (const action of frame.actions) {
       if (!action || !['command', 'pause', 'restart', 'retry', 'start'].includes(action.type)) throw Error(`Invalid replay action at tick ${tick}`);
-      if (action.type === 'command' && (!Number.isInteger(action.direction) || action.direction < 0 || action.direction > 3 || typeof action.fire !== 'boolean')) throw Error(`Invalid replay command at tick ${tick}`);
+      if (action.type === 'command' && (!Number.isInteger(action.direction) || action.direction < 0 || action.direction > 3 || typeof action.fire !== 'boolean' || (action.aimOnly !== undefined && typeof action.aimOnly !== 'boolean') || (action.aimOnly === true && action.fire))) throw Error(`Invalid replay command at tick ${tick}`);
       applyAction(session, action);
     }
     const world = session.world, eventsBefore = world.events.length;

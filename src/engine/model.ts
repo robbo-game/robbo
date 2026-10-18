@@ -25,7 +25,8 @@ export interface Entity {
 }
 export type SoundName = 'exit-open' | 'walk' | 'shoot' | 'gun' | 'ammo' | 'screw' | 'key' | 'door' | 'box' | 'bomb' | 'kill' | 'teleport' | 'end' | 'capsule' | 'magnet' | 'bird' | 'worm';
 export interface GameEvent { type: SoundName; tick: number }
-export interface Command { direction: Direction; fire: boolean }
+/** aimOnly changes orientation without movement or firing; omission preserves legacy commands. */
+export interface Command { direction: Direction; fire: boolean; aimOnly?: boolean }
 export const symbolKinds: Record<string, Kind> = {
   R: 'robot', '!': 'ship', T: 'screw', '%': 'key', "'": 'ammo', D: 'door', '#': 'box', '~': 'momentum', b: 'bomb', '?': 'question', '&': 'mirror', M: 'magnet', '=': 'river', '^': 'bird', '@': 'bear', '*': 'worm', V: 'eyes', '}': 'cannon', H: 'sand', X: 'stop',
   s: 'wall', '-': 'wall', O: 'wall', o: 'wall', S: 'wall', p: 'wall', P: 'wall', Q: 'wall', q: 'wall', '+': 'wall'

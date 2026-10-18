@@ -61,8 +61,8 @@ export class GameWorld {
   }
   emit(type: SoundName): void { this.events.push({ type, tick: this.tick }); }
   drainEvents(): GameEvent[] { return this.events.splice(0); }
-  command(direction: Direction, fire = false): void {
-    if (this.status === 'playing' && !this.teleportTicks) this.pending = { direction, fire };
+  command(direction: Direction, fire = false, aimOnly = false): void {
+    if (this.status === 'playing' && !this.teleportTicks) this.pending = aimOnly ? { direction, fire: false, aimOnly: true } : { direction, fire };
   }
   clearInput(): void { this.pending = undefined; }
 
@@ -196,7 +196,7 @@ export class GameWorld {
       this.robot.direction = command.direction;
       if (command.fire) {
         if (this.ammo > 0) { this.ammo--; this.fire(this.robot, command.direction, 0); this.emit('shoot'); }
-      } else this.moveRobot(command.direction);
+      } else if (!command.aimOnly) this.moveRobot(command.direction);
     }
     this.checkAdjacency();
   }

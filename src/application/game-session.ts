@@ -32,7 +32,7 @@ export class GameSession {
     this.load(number - 1); this.start();
   }
   togglePause(): void { if (this.started && !this.completed) { this.paused = !this.paused; this.world.clearInput(); } }
-  command(direction: Direction, fire = false): void { if (this.started && !this.paused && !this.completed) this.world.command(direction, fire); }
+  command(direction: Direction, fire = false, aimOnly = false): void { if (this.started && !this.paused && !this.completed) this.world.command(direction, fire, aimOnly); }
   step(): void {
     if (!this.started || this.paused || this.completed) return;
     this.world.step();

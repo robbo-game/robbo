@@ -4,11 +4,11 @@ import { ActionInput } from '../../../src/browser/input/action-input';
 describe('Shared cardinal input', () => {
   it('prioritizes the newest held device and restores the previous direction on release', () => {
     const input = new ActionInput(); input.set('key:up', 'up', true); input.set('touch:1', 'right', true); input.set('key:ctrl', 'fire', true);
-    expect(input.command()).toEqual({ direction: 0, fire: true }); input.release('touch:'); expect(input.command()?.direction).toBe(3); input.release(); expect(input.command()).toBeUndefined();
+    expect(input.command()).toEqual({ direction: 0, fire: true }); input.release('touch:'); expect(input.command()).toEqual({ direction: 3, fire: false, aimOnly: true }); input.release(); expect(input.command()).toBeUndefined();
   });
   it('remaps gamepad fire and rejects button conflicts', () => {
-    const input = new ActionInput(); expect(input.bindPad('fire', 9)).toBeTruthy(); expect(input.bindPad('fire', 1)).toBeUndefined();
-    const buttons = Array.from({ length: 16 }, () => ({ pressed: false, touched: false, value: 0 })); buttons[1].pressed = true; input.gamepad({ axes: [1, 0], buttons }); expect(input.command()).toEqual({ direction: 0, fire: true });
+    const input = new ActionInput(); expect(input.bindPad('fire', 9)).toBeTruthy(); expect(input.bindPad('fire', 2)).toBeUndefined();
+    const buttons = Array.from({ length: 16 }, () => ({ pressed: false, touched: false, value: 0 })); buttons[2].pressed = true; input.gamepad({ axes: [1, 0], buttons }); expect(input.command()).toEqual({ direction: 0, fire: true });
   });
   it('requires held gamepad buttons to release after a lifecycle reset', () => {
     const input = new ActionInput(); const buttons = Array.from({ length: 16 }, () => ({ pressed: false, touched: false, value: 0 })); buttons[9].pressed = true;
@@ -59,7 +59,57 @@ describe('Precise touch repeats', () => {
     input.set('pointer:2', 'fire', true);
     expect(input.command(3, 100)).toEqual({ direction: 0, fire: true });
     input.set('pointer:1', 'right', false);
-    expect(input.command(3, 100)).toEqual({ direction: 0, fire: true });
+    expect(input.command(0, 100)).toBeUndefined();
     input.release(); expect(input.command(3, 300)).toBeUndefined();
+  });
+});
+
+
+describe('Single shots and stationary aim', () => {
+  it('consumes one press once even across repeated polls and retargeting', () => {
+    const input = new ActionInput();
+    input.set('pointer:1', 'fire', true);
+    expect(input.command(2)).toEqual({ direction: 2, fire: true });
+    for (let tick = 0; tick < 30; tick++) expect(input.command(2)).toBeUndefined();
+    expect(input.set('pointer:1', 'fire', true)).toBe(false);
+    input.set('pointer:2', 'up', true);
+    expect(input.command(2)).toEqual({ direction: 3, fire: false, aimOnly: true });
+    input.set('pointer:1', 'fire', false); input.set('pointer:1', 'fire', true);
+    expect(input.command(3)).toEqual({ direction: 3, fire: true });
+  });
+  it('waits for a direction for keyboard Ctrl and does not repeat the chord', () => {
+    const input = new ActionInput(); input.set('key:Control', 'fire', true);
+    expect(input.command(1)).toBeUndefined();
+    input.set('key:ArrowUp', 'up', true);
+    expect(input.command(1)).toEqual({ direction: 3, fire: true });
+    expect(input.command(3)).toEqual({ direction: 3, fire: false, aimOnly: true });
+    input.set('key:ArrowUp', 'up', false); input.set('key:ArrowUp', 'up', true);
+    expect(input.command(3)).toEqual({ direction: 3, fire: false, aimOnly: true });
+  });
+  it('requires all fire sources to release before another shot', () => {
+    const input = new ActionInput(); input.set('pointer:1', 'fire', true);
+    expect(input.command(0)?.fire).toBe(true);
+    input.set('pad:fire', 'fire', true); input.set('pointer:1', 'fire', false);
+    expect(input.command(0)).toBeUndefined();
+    input.set('pad:fire', 'fire', false); input.set('pad:fire', 'fire', true);
+    expect(input.command(0)?.fire).toBe(true);
+  });
+  it('aims in all four directions without firing and permits a deliberate shot', () => {
+    const input = new ActionInput(); input.set('key:Shift', 'aim', true);
+    for (const [direction, action] of (['right', 'down', 'left', 'up'] as const).entries()) {
+      input.set('key:direction', action, true);
+      expect(input.command()).toEqual({ direction, fire: false, aimOnly: true });
+    }
+    input.set('key:Control', 'fire', true);
+    expect(input.command()).toEqual({ direction: 3, fire: true });
+  });
+  it('discards an unconsumed press on cancellation and blocks held pad fire after reset', () => {
+    const input = new ActionInput(); input.set('pointer:1', 'fire', true); input.release();
+    expect(input.command(0)).toBeUndefined();
+    const buttons = Array.from({ length: 16 }, () => ({ pressed: false, touched: false, value: 0 })); buttons[0].pressed = true;
+    input.gamepad({ axes: [0, 0], buttons });
+    expect(input.command(0)?.fire).toBe(true); input.release();
+    input.gamepad({ axes: [0, 0], buttons });
+    expect(input.command(0)).toBeUndefined();
   });
 });
