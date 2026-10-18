@@ -1,7 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { steps, world } from '../fixtures/world';
+import { GameWorld } from '../../src/engine/game-world';
+import { packs } from '../../src/generated/packs';
 
 describe('Java bomb timing contracts from C reference review (#19)', () => {
+  for (const pack of packs) it(`destroys planet 12's lower door with its adjacent bomb in pack ${pack.id}`, () => {
+    const w = new GameWorld(pack.levels[11], () => 0.5);
+    const door = w.at(7, 19)!;
+    const bomb = w.at(7, 18)!;
+    expect(door.kind).toBe('door'); expect(bomb.kind).toBe('bomb');
+    expect(w.damage(door, 'shot')).toBe(false);
+    w.damage(bomb, 'shot'); steps(w, 1);
+    expect(door.alive).toBe(false);
+    expect(w.at(7, 19)).toMatchObject({ kind: 'blast' });
+    steps(w, 4);
+    expect(w.at(7, 19)).toBeUndefined();
+    expect(w.at(14, 16)).toMatchObject({ kind: 'door' });
+    expect(w.keys).toBe(0);
+  });
   it('traces opposing chain triggers without detonating a bomb twice', () => {
     const w = world(['R.......', '........', '........', '........', '........', '........']);
     const left = w.spawn('bomb', 3, 3), middle = w.spawn('bomb', 4, 3), right = w.spawn('bomb', 5, 3);

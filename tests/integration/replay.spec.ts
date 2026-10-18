@@ -29,6 +29,21 @@ function recordPlanet6(seed: number): ReplayRecorder {
   throw Error('Expected bird contact on the formerly winning route');
 }
 describe('Seeded normal-API replays', () => {
+  it('replays a bomb opening a door without a key and rejects the previous rules', () => {
+    const pack = { id: 'bomb-door', name: 'Bomb door', lastLevel: 1,
+      levels: [level(['ssssssss', "sR'....s", 's....bDs', 's......s', 'ssssssss'])] };
+    const session = new GameSession(pack, 7); session.start();
+    const recorder = new ReplayRecorder(session);
+    recorder.action({ type: 'command', direction: 0, fire: false }); recorder.step();
+    recorder.action({ type: 'command', direction: 1, fire: false }); recorder.step();
+    recorder.action({ type: 'command', direction: 0, fire: true }); recorder.step();
+    for (let i = 0; i < 12; i++) recorder.step();
+    expect(session.world.at(6, 2)).toBeUndefined();
+    expect(session.world.status).toBe('playing'); expect(session.world.keys).toBe(0);
+    expect(checkpoint(playReplay(recorder.export(), [pack]))).toBe(checkpoint(session));
+    const old = JSON.parse(recorder.export()); old.engine = 'robbo-java-2';
+    expect(() => playReplay(JSON.stringify(old), [pack])).toThrow('Incompatible replay');
+  });
   it('replays the former planet6 route ending in bird contact death', () => {
     const recorder = recordPlanet6(3);
     const replayed = playReplay(recorder.export(), packs);

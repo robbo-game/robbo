@@ -58,7 +58,7 @@ describe('Combat and finite effects', () => {
     const w = world(['sssssssss', 'sR......s', 's...%D..s', 's..#b&..s', 's...bT..s', 's.......s', 'sssssssss']);
     const first = w.at(4, 3); w.damage(first, 'shot'); expect(w.damage(first, 'shot')).toBe(false);
     steps(w, 1); expect(w.at(4, 4).kind).toBe('blast'); expect(w.at(4, 2).kind).toBe('key'); expect(w.at(5, 3).kind).toBe('mirror');
-    steps(w, 1); expect(w.at(4, 2).kind).toBe('blast'); expect(w.at(5, 2).kind).toBe('door');
+    steps(w, 1); expect(w.at(4, 2).kind).toBe('blast'); expect(w.at(5, 2).kind).toBe('blast');
     expect(w.drainEvents().filter(e => e.type === 'bomb')).toHaveLength(2);
     steps(w, 8); expect(w.blasts).toHaveLength(0); expect([...w.entities.values()].some(e => e.kind === 'blast')).toBe(false);
   });
@@ -81,7 +81,8 @@ describe('Combat and finite effects', () => {
     expect(w.entities.size).toBe(1); expect(w.at(3, 2)).toBeUndefined();
   });
   it('keeps the Java shot/blast/river immunity differences explicit', () => {
-    for (const kind of ['wall', 'door', 'mirror', 'magnet', 'cannon', 'momentum'] as Kind[]) expect(blastTargets.has(kind)).toBe(false);
+    for (const kind of ['wall', 'mirror', 'magnet', 'cannon', 'momentum'] as Kind[]) expect(blastTargets.has(kind)).toBe(false);
+    expect(shotTargets.has('door')).toBe(false); expect(blastTargets.has('door')).toBe(true);
     expect(shotTargets.has('screw')).toBe(false); expect(blastTargets.has('screw')).toBe(true);
     expect(riverTargets.has('cannon')).toBe(true); expect(riverTargets.has('door')).toBe(false);
   });
