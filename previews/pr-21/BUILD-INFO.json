@@ -1,0 +1,12 @@
+{
+  "tag": "pr-21-ea0ab3facfef41f95f1b0846f48e625487b934d1",
+  "title": "Robbo PR #21 · fix/precise-fire-and-stationary-aim · ea0ab3facfef",
+  "prerelease": true,
+  "sha": "ea0ab3facfef41f95f1b0846f48e625487b934d1",
+  "pr": 21,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/21",
+  "branch": "fix/precise-fire-and-stationary-aim",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/fix%2Fprecise-fire-and-stationary-aim",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/ea0ab3facfef41f95f1b0846f48e625487b934d1",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/21\n- Branch: [fix/precise-fire-and-stationary-aim](https://github.com/sigmalko/robbo/tree/fix%2Fprecise-fire-and-stationary-aim)\n- Built commit: https://github.com/sigmalko/robbo/commit/ea0ab3facfef41f95f1b0846f48e625487b934d1\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
