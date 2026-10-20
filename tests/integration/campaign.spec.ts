@@ -57,6 +57,22 @@ describe('Imported campaigns', () => {
     expect(packs[0].levels[0].rows[6][3]).toBe("'"); expect(packs[0].levels[0].options['3,6']).toBeUndefined();
     expect(packs[1].levels[0].rows[6][3]).toBe('.'); expect(packs[1].levels[0].options['2,10']).toBeUndefined();
   });
+  it('opens historical walls that isolate required pickups', () => {
+    for (const pack of packs) {
+      expect(pack.levels[12].rows[13][11]).toBe('.');
+      expect(pack.levels[14].rows[22][5]).toBe('.');
+      expect(pack.levels[35].rows[29][13]).toBe('.');
+      const w = new GameWorld(pack.levels[12], seededRandom(1));
+      w.move(w.robot, 13, 13);
+      for (let step = 0; step < 4; step++) { w.command(2); w.step(); }
+      expect([w.robot.x, w.robot.y, w.keys]).toEqual([9, 13, 1]);
+    }
+  });
+  it('reaches the screw beside the bomb on planet 16', () => {
+    const w = new GameWorld(packs[0].levels[15], seededRandom(16));
+    for (const direction of [1, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1] as Direction[]) { w.command(direction); w.step(); }
+    expect([w.robot.x, w.robot.y, w.remaining]).toEqual([7, 13, 15]);
+  });
   it('retries the same planet with fresh state and suppresses input when paused', () => {
     const session = new GameSession(packs[0], 2); session.selectPlanet(6);
     const old = session.world; old.ammo = 20; old.keys = 2; old.killRobot();

@@ -1137,7 +1137,7 @@ export const packs: Pack[] = [
           "Q!.#.##H...H.HTQ",
           "Q.#T#....H.....Q",
           "Q#.#.#Q&QQQQQQQQ",
-          "Q.#.#.Q.Q%.+..&Q",
+          "Q.#.#.Q.Q%....&Q",
           "QQQQQQQ.QQQQQQQQ",
           "Q#......Q......Q",
           "Q....#?.Q.##@Q.Q",
@@ -1310,7 +1310,7 @@ export const packs: Pack[] = [
           "sss.sssssssss'ss",
           "--s...D....Tssss",
           "sss.sssssss...#s",
-          "s..&.+....s.}..s",
+          "s..&......s.}..s",
           "s.sssssss.ss.s.s",
           "s.s....Ts.Ts..Ts",
           "s.s.....ssss.sss",
@@ -3309,7 +3309,7 @@ export const packs: Pack[] = [
           "p.p.p.ppp.pppppp",
           "p...p.....p...&p",
           "ppppppppppp.pppp",
-          "}HHHHHHHHHHHH+Tp",
+          "}HHHHHHHHHHHH.Tp",
           "pppppppppppppppp"
         ],
         "options": {
@@ -6663,7 +6663,7 @@ export const packs: Pack[] = [
           "Q!.#.##H...H.HTQ",
           "Q.#T#....H.....Q",
           "Q#.#.#Q&QQQQQQQQ",
-          "Q.#.#.Q.Q%.+..&Q",
+          "Q.#.#.Q.Q%....&Q",
           "QQQQQQQ.QQQQQQQQ",
           "Q#......Q......Q",
           "Q....#?.Q.##@Q.Q",
@@ -6836,7 +6836,7 @@ export const packs: Pack[] = [
           "sss.sssssssss'ss",
           "--s...D....Tssss",
           "sss.sssssss...#s",
-          "s..&.+....s.}..s",
+          "s..&......s.}..s",
           "s.sssssss.ss.s.s",
           "s.s....Ts.Ts..Ts",
           "s.s.....ssss.sss",
@@ -8835,7 +8835,7 @@ export const packs: Pack[] = [
           "p.p.p.ppp.pppppp",
           "p...p.....p...&p",
           "ppppppppppp.pppp",
-          "}HHHHHHHHHHHH+Tp",
+          "}HHHHHHHHHHHH.Tp",
           "pppppppppppppppp"
         ],
         "options": {
