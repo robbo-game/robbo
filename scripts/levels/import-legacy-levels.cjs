@@ -3,18 +3,15 @@ const path = require('node:path');
 const { parseCampaign } = require('./campaign-parser.cjs');
 const manifest = JSON.parse(fs.readFileSync('resources/levels/packs.json', 'utf8'));
 
-const wallSymbols = new Set('s-OoSpPQq+');
+const wallSymbols = new Set('s-OoSpPQq');
 
-// The historical map files are kept byte-for-byte as archival sources. These
-// walls isolate a required pickup in both variants. Apply the smallest
-// correction to the playable copy only.
-function applyPlayableCorrections(pack) {
-  for (const [number, x, y] of [[13, 11, 13], [15, 5, 22], [36, 13, 29]]) {
-    const level = pack.levels[number - 1];
-    if (!level || level.number !== number || level.rows[y]?.[x] !== '+') throw Error(`Unexpected planet ${number} layout in pack ${pack.id}`);
-    const rows = [...level.rows];
-    rows[y] = `${rows[y].slice(0, x)}.${rows[y].slice(x + 1)}`;
-    pack.levels[number - 1] = { ...level, rows };
+// GNU Robbo uses + for an extra-life pickup, whereas the Java engine uses +
+// for a wall. Extra lives are not modelled here, so keep the source bytes and
+// import each + as an empty floor tile rather than turning it into a wall.
+function normalizeGnuLifePickups(pack) {
+  for (const level of pack.levels) {
+    if (!level.rows.some(row => row.includes('+'))) continue;
+    pack.levels[level.number - 1] = { ...level, rows: level.rows.map(row => row.replaceAll('+', '.')) };
   }
 }
 
@@ -58,7 +55,7 @@ for (const config of manifest.packs) {
   ids.add(config.id);
   const source = path.join('resources/levels', config.file);
   const result = parseCampaign(fs.readFileSync(source, 'utf8'), config, source);
-  applyPlayableCorrections(result.pack);
+  normalizeGnuLifePickups(result.pack);
   verifyCriticalPickupAccess(result.pack);
   packs.push(result.pack); diagnostics.push(...result.diagnostics);
 }

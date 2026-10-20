@@ -17,16 +17,13 @@ to its playable copy where a verified source-map error makes a puzzle
 impossible. Preserve the original DAT files and record each correction in the
 importer.
 
-## Playable-map corrections
+## GNU life pickups
 
-Both historical packs have the same errors below. Each listed wall is replaced
-with empty floor in generated output; canonical DAT files remain unchanged.
-
-| Planet | Zero-based coordinate | Isolated item |
-| --- | --- | --- |
-| 13 | `11,13` | key |
-| 15 | `5,22` | screw |
-| 36 | `13,29` | screw |
+The two historical Robbo I packs use GNU Robbo's `+` symbol for an extra-life
+pickup. In this Java-compatible engine `+` would mean a wall, while extra lives
+are not modelled. The importer therefore converts every `+` to empty floor in
+the playable output and preserves the canonical DAT files unchanged. This
+includes the tile beside the upper-left screw on planet 16.
 
 During import, the campaign is also checked for keys and screws structurally
 isolated by walls. Dynamic objects are treated as passable, so legitimate
