@@ -12,7 +12,25 @@ Git attributes preserve LF for generated text and preserve original DAT bytes.
 The parser validates the complete campaign before publishing output. Historical
 record counts are advisory. The canonical manifest explicitly permits stale
 metadata and resolves duplicates using last-wins; mismatching metadata is
-reported and ignored. Preserve these policies and original puzzles.
+reported and ignored. The importer also applies documented, minimal corrections
+to its playable copy where a verified source-map error makes a puzzle
+impossible. Preserve the original DAT files and record each correction in the
+importer.
+
+## Playable-map corrections
+
+Both historical packs have the same errors below. Each listed wall is replaced
+with empty floor in generated output; canonical DAT files remain unchanged.
+
+| Planet | Zero-based coordinate | Isolated item |
+| --- | --- | --- |
+| 13 | `11,13` | key |
+| 15 | `5,22` | screw |
+| 36 | `13,29` | screw |
+
+During import, the campaign is also checked for keys and screws structurally
+isolated by walls. Dynamic objects are treated as passable, so legitimate
+puzzles requiring a push, shot, or bomb remain valid.
 
 ## Candidate packs
 
