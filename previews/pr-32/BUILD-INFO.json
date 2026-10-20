@@ -1,0 +1,12 @@
+{
+  "tag": "pr-32-7b380dcb3ccb523250cb1c6d12fcf413e2de0005",
+  "title": "Robbo PR #32 · fix/gnu-life-pickups · 7b380dcb3ccb",
+  "prerelease": true,
+  "sha": "7b380dcb3ccb523250cb1c6d12fcf413e2de0005",
+  "pr": 32,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/32",
+  "branch": "fix/gnu-life-pickups",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/fix%2Fgnu-life-pickups",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/7b380dcb3ccb523250cb1c6d12fcf413e2de0005",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/32\n- Branch: [fix/gnu-life-pickups](https://github.com/sigmalko/robbo/tree/fix%2Fgnu-life-pickups)\n- Built commit: https://github.com/sigmalko/robbo/commit/7b380dcb3ccb523250cb1c6d12fcf413e2de0005\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
