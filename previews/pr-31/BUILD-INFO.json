@@ -1,0 +1,12 @@
+{
+  "tag": "pr-31-dff82dc9ad34c458ab25b604f5ef329a6004ccf1",
+  "title": "Robbo PR #31 · fix/unreachable-campaign-pickups · dff82dc9ad34",
+  "prerelease": true,
+  "sha": "dff82dc9ad34c458ab25b604f5ef329a6004ccf1",
+  "pr": 31,
+  "prUrl": "https://github.com/sigmalko/robbo/pull/31",
+  "branch": "fix/unreachable-campaign-pickups",
+  "branchUrl": "https://github.com/sigmalko/robbo/tree/fix%2Funreachable-campaign-pickups",
+  "commitUrl": "https://github.com/sigmalko/robbo/commit/dff82dc9ad34c458ab25b604f5ef329a6004ccf1",
+  "notes": "Preview build for testing before merge. Report feedback on the linked pull request.\n\n- Pull request: https://github.com/sigmalko/robbo/pull/31\n- Branch: [fix/unreachable-campaign-pickups](https://github.com/sigmalko/robbo/tree/fix%2Funreachable-campaign-pickups)\n- Built commit: https://github.com/sigmalko/robbo/commit/dff82dc9ad34c458ab25b604f5ef329a6004ccf1\n\nDownload robbo.zip, extract it, and open robbo/index.html. This release does not merge the pull request.\n"
+}
