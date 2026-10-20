@@ -28,7 +28,7 @@ describe('Imported campaigns', () => {
           }
         }
       }
-      expect(symbols.size).toBe(31); for (const symbol of symbols) expect(symbol === '.' || !!symbolKinds[symbol]).toBe(true);
+      expect(symbols.size).toBe(30); for (const symbol of symbols) expect(symbol === '.' || !!symbolKinds[symbol]).toBe(true);
     });
     it(`transitions at the exit through every planet and completes without planet 57 in pack ${pack.id}`, () => {
       const session = new GameSession(pack, 1); session.start();
@@ -57,11 +57,13 @@ describe('Imported campaigns', () => {
     expect(packs[0].levels[0].rows[6][3]).toBe("'"); expect(packs[0].levels[0].options['3,6']).toBeUndefined();
     expect(packs[1].levels[0].rows[6][3]).toBe('.'); expect(packs[1].levels[0].options['2,10']).toBeUndefined();
   });
-  it('opens historical walls that isolate required pickups', () => {
+  it('converts GNU extra-life pickups so they cannot become impassable walls', () => {
     for (const pack of packs) {
       expect(pack.levels[12].rows[13][11]).toBe('.');
       expect(pack.levels[14].rows[22][5]).toBe('.');
+      expect(pack.levels[15].rows[23][7]).toBe('.');
       expect(pack.levels[35].rows[29][13]).toBe('.');
+      expect(pack.levels.every(level => !level.rows.some(row => row.includes('+')))).toBe(true);
       const w = new GameWorld(pack.levels[12], seededRandom(1));
       w.move(w.robot, 13, 13);
       for (let step = 0; step < 4; step++) { w.command(2); w.step(); }
