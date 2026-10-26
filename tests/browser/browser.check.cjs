@@ -1,7 +1,8 @@
+const { withSettings } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
+const { pathToFileURL, fileURLToPath } = require('node:url');
 const { spawn } = require('node:child_process');
 const { chromium } = require('playwright');
 
@@ -9,7 +10,7 @@ async function main() {
   const root = path.resolve('release/robbo');
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   for (const [, reference] of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
-    const resource = path.resolve(root, reference);
+    const resource = fileURLToPath(new URL(reference, pathToFileURL(path.join(root, 'index.html'))));
     assert(resource.startsWith(root + path.sep), `Resource escapes release: ${reference}`);
     assert(fs.existsSync(resource), `Missing release resource: ${reference}`);
   }
@@ -37,10 +38,12 @@ async function main() {
       await page.goto(base);
       await page.waitForFunction(() => document.getElementById('board').dataset.tick !== undefined);
       assert.equal(await page.locator('#object-help details').count(), 6);
+      await page.locator('[data-page-link="objects"]').first().click();
       const helpSummary = page.locator('#object-help summary').first();
       await helpSummary.focus(); await page.keyboard.press('Enter');
       assert.equal(await page.locator('#object-help details').first().getAttribute('open'), '');
       assert.match(await page.locator('#object-help').textContent(), /survive explosions/);
+      await page.locator('.subpage[data-page="objects"] [data-page-link="game"]').click();
       assert.match(await page.locator('#board').getAttribute('aria-label'), /arrow keys/);
 
       await page.locator('#continue').click();
@@ -114,9 +117,9 @@ async function main() {
       await load(['ssssssss', 'sR.....s', 's.}....s', 'ssssssss'], { '2,2': [0, 0, 0, 0, 0, 0] }); await page.evaluate(() => window.robboTest.step(6));
       await load(['ssssssss', 'sM...R.s', 'ssssssss'], { '1,1': [0] }); await page.evaluate(() => window.robboTest.step());
       const beforeMute = await page.evaluate(() => window.audioCalls.length);
-      await page.locator('#mute').check(); await page.locator('#enable-sound').click();
+      await withSettings(page, async () => { await page.locator('#mute').check(); await page.locator('#enable-sound').click(); });
       assert.equal(await page.evaluate(() => window.audioCalls.length), beforeMute, 'Mute must prevent new playback');
-      await page.locator('#mute').uncheck(); await page.locator('#enable-sound').click();
+      await withSettings(page, async () => { await page.locator('#mute').uncheck(); await page.locator('#enable-sound').click(); });
       await page.waitForTimeout(200);
       const calls = await page.evaluate(() => window.audioCalls);
       for (const fragment of ['ammo_02', 'shoot_default', 'screw2', 'key2', 'door_02', 'ship-departure', 'bomb', 'kill', 'teleport', 'planet-arrival', 'box', 'gun_default', 'magnet', 'walk_01']) assert(calls.some(url => url.includes(fragment)), `Missing native audio playback: ${fragment}`);

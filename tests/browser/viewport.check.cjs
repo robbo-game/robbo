@@ -1,3 +1,4 @@
+const { selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -14,7 +15,7 @@ async function main() {
       await page.goto(pathToFileURL(path.resolve('release/robbo/index.html')).href + '#test');
       await page.waitForFunction(() => !!window.robboTest);
       await page.evaluate(() => window.robboTest.load(Array.from({ length: 80 }, (_, y) => '.'.repeat(79) + (y === 79 ? 'R' : '.'))));
-      await page.selectOption('#theme', theme);
+      await selectSetting(page, '#theme', theme);
       await page.waitForFunction(id => document.documentElement.dataset.theme === id, theme);
       await page.evaluate(() => {
         const draw = CanvasRenderingContext2D.prototype.drawImage;
@@ -55,7 +56,7 @@ async function main() {
         for (const icon of await page.locator('.hud .icon').all()) assert(await icon.isVisible(), 'Inventory pictograms stay visible on every screen size');
         assert.equal(view.overflow, false, `${width}x${height}: no horizontal page overflow`);
         assert.equal(view.width, touch && width > height && height <= 600 ? width - 292 : width, 'Board uses available space between thumb controls');
-        assert(view.height > height / 2, 'Most of the screen must be available for the board');
+        assert(view.height > height / 2, `${width}x${height}, touch=${touch}, ${theme}: board height ${view.height} must exceed half the screen`);
         assert(view.bottom <= view.playBottom, 'HUD and controls fit in the first screen');
         assert(Math.abs(view.width / view.tiles[0] - view.height / view.tiles[1]) < 0.01, 'Tiles must remain square');
         for (const axis of [0, 1]) assert(79 >= view.camera[axis] && 80 <= view.camera[axis] + view.tiles[axis], 'Robot remains fully visible after resize');

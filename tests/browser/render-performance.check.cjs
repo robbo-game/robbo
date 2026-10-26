@@ -1,3 +1,4 @@
+const { selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -15,7 +16,7 @@ async function main() {
     await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
     for (const theme of ['java-atlas-v1', 'neon-forge-v1', 'planet-journey-4']) {
       await page.evaluate(rows => window.robboTest.load(rows), rows);
-      await page.selectOption('#theme', theme);
+      await selectSetting(page, '#theme', theme);
       await page.waitForFunction(id => document.documentElement.dataset.theme === id, theme);
       const timings = await page.evaluate(async () => {
         const frames = [];
@@ -43,7 +44,6 @@ async function main() {
         });
         window.movementObserver.observe(document.getElementById('board'), { attributes: true, attributeFilter: ['data-robot'] });
       }, rows);
-      await page.locator('#back-to-game').click();
       assert.equal(await page.evaluate(() => document.activeElement.id), 'board');
       for (let i = 0; i < 6; i++) {
         await page.keyboard.press(i % 2 ? 'ArrowLeft' : 'ArrowRight');

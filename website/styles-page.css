@@ -90,7 +90,7 @@ html[data-touch-fire-side="left"] .touch-actions { order: 1; }
 .touch-controls p { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
 @media (hover: hover) and (pointer: fine) { .touch-controls { display: none; } }
 @media (pointer: coarse) {
-  .toolbar button { min-height: 48px; }
+  .toolbar button { min-width: 48px; min-height: 48px; flex: 1 0 auto; }
   .toolbar #start { display: none; }
   .hud { padding: 4px 12px; }
 }
@@ -148,3 +148,7 @@ a { color: #caff45; }
 .toolbar a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 10px; font-size: 12px; }
 a:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
 .subpage h1, .subpage h2 { overflow-wrap: anywhere; }
+@media (pointer: coarse) and (max-width: 340px) {
+  .toolbar { gap: 2px; padding: 2px; }
+  .toolbar a { padding: 4px; font-size: 11px; }
+}

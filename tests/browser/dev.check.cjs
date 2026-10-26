@@ -1,3 +1,4 @@
+const { selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const http = require('node:http');
@@ -39,7 +40,7 @@ async function main() {
     await page.waitForFunction(() => document.querySelector('#board').dataset.tick > 0);
     await page.locator('#pause').click();
     assert.equal(await page.locator('#state-title').textContent(), 'Paused');
-    await page.selectOption('#theme', 'planet-journey-4');
+    await selectSetting(page, '#theme', 'planet-journey-4');
     await page.waitForFunction(() => document.documentElement.dataset.theme === 'planet-journey-4');
     assert.equal(await page.locator('.hud .icon canvas').count(), 3);
     assert.deepEqual(errors, []);

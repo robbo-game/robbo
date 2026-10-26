@@ -1,3 +1,4 @@
+const { selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -8,8 +9,7 @@ const { chromium } = require('playwright');
     const context = await browser.newContext({ viewport: { width: 390, height: 760 }, hasTouch: true });
     const page = await context.newPage();
     await page.goto(pathToFileURL(path.resolve('release/robbo/index.html')).href + '#test');
-    await page.selectOption('#touch-movement', 'dpad');
-    await page.locator('#back-to-game').click();
+    await selectSetting(page, '#touch-movement', 'dpad');
     const cdp = await context.newCDPSession(page);
     const touch = (type, touchPoints) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints });
     const point = async action => { const b = await page.locator(`[data-action="${action}"]`).boundingBox(); return { x: b.x + b.width / 2, y: b.y + b.height / 2, id: 1 }; };

@@ -1,3 +1,4 @@
+const { selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -10,9 +11,9 @@ const { chromium } = require('playwright');
       const page = await context.newPage();
       const errors = []; page.on('pageerror', error => errors.push(error.message));
       await page.goto(pathToFileURL(path.resolve('release/robbo/index.html')).href + '#test');
-      await page.selectOption('#touch-fire-side', side); await page.reload();
+      await selectSetting(page, '#touch-fire-side', side); await page.reload();
       assert.equal(await page.locator('#touch-fire-side').inputValue(), side, 'Layout survives reload');
-      await page.locator('#back-to-game').click(); await page.selectOption('#touch-movement', 'dpad'); await page.locator('#back-to-game').click();
+      await selectSetting(page, '#touch-movement', 'dpad');
       const cdp = await context.newCDPSession(page);
       const point = async (action, id) => {
         const box = await page.locator(`[data-action="${action}"]`).boundingBox();

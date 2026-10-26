@@ -1,3 +1,4 @@
+const { openSettings, returnToGame, selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const fs = require('node:fs/promises');
@@ -46,8 +47,7 @@ async function move(page, key) {
     await page.waitForFunction(() => document.documentElement.dataset.theme === 'java-atlas-v1');
     assert.equal(await page.locator('#pack').inputValue(), '01', 'Fresh profiles default to Original Legacy');
     assert.equal(await page.locator('#theme').inputValue(), 'java-atlas-v1', 'Classic artwork is the default');
-    await page.selectOption('#pack', '02'); await page.selectOption('#planet', '20');
-    await page.locator('#back-to-game').click();
+    await selectSetting(page, '#pack', '02'); await selectSetting(page, '#planet', '20');
     await page.waitForFunction(() => document.getElementById('board').dataset.effect !== 'arrival');
     for (const key of ['ArrowRight', 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowUp']) await move(page, key);
     await page.locator('#pause').click();
@@ -80,7 +80,9 @@ async function move(page, key) {
     await page.waitForFunction(() => document.getElementById('state-title').textContent === 'Paused');
     assert.equal((await readSave(page)).world.ammo, 0, 'Planet reset replaces the saved inventory');
     assert.equal(await page.locator('#planet').inputValue(), '20');
+    await openSettings(page);
     await page.getByRole('button', { name: 'Reset saved progress' }).click();
+    await returnToGame(page);
     await page.locator('#pause').click();
     await page.reload();
     await page.waitForFunction(() => document.getElementById('state-title').textContent === 'Paused');
@@ -110,7 +112,7 @@ async function move(page, key) {
     context = await engine.launchPersistentContext(path.join(directory, 'fallback'), options);
     await context.addInitScript(() => Object.defineProperty(window, 'indexedDB', { get() { throw Error('Blocked storage'); } }));
     page = context.pages()[0]; await page.goto(url);
-    await page.selectOption('#planet', '20'); await page.locator('#pause').click();
+    await selectSetting(page, '#planet', '20'); await page.locator('#pause').click();
     const fallback = await page.evaluate(() => JSON.parse(localStorage.getItem('robbo.attempt.backup.v1')));
     await page.reload(); await page.waitForFunction(() => document.getElementById('state-title').textContent === 'Paused');
     const recovered = await page.evaluate(() => JSON.parse(localStorage.getItem('robbo.attempt.backup.v1')));

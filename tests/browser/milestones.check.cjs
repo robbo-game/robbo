@@ -1,3 +1,4 @@
+const { selectSetting, withSettings } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -36,7 +37,7 @@ async function main() {
     assert.equal(await page.locator('#board').getAttribute('data-tick'), '0');
     await page.waitForFunction(() => document.querySelector('#board').dataset.effect === '');
     for (const theme of ['java-atlas-v1', 'neon-forge-v1', 'planet-journey-6']) {
-      await page.selectOption('#theme', theme);
+      await selectSetting(page, '#theme', theme);
       await page.waitForFunction(id => document.documentElement.dataset.theme === id, theme);
       await click('Preview final screw');
       assert.equal((await state()).remaining, 0);
@@ -97,7 +98,7 @@ async function main() {
     await step(9);
     // Respect reduced motion, mute and volume; retry must cancel all pending flight effects.
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.locator('#mute').check();
+    await withSettings(page, () => page.locator('#mute').check());
     const mutedBefore = await page.evaluate(() => window.mediaResults.length);
     await click('Preview final screw');
     assert.equal(await page.locator('#milestone-notice').getAttribute('data-reduced'), 'true');
@@ -105,7 +106,7 @@ async function main() {
     await capture('reduced-motion');
     await click('Preview take-off'); await click('Reset planet'); await step(1);
     assert.equal(await page.locator('#board').getAttribute('data-effect'), 'arrival');
-    await page.locator('#mute').uncheck(); await page.locator('#volume').fill('20');
+    await withSettings(page, async () => { await page.locator('#mute').uncheck(); await page.locator('#volume').fill('20'); });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await click('Preview final screw');
     await page.waitForFunction(() => window.mediaResults.some(item => item.src.endsWith('/ship-ready.wav') && item.ok && Math.abs(item.volume - 0.2) < 0.001));

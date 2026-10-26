@@ -1,3 +1,4 @@
+const { selectSetting } = require('./settings.cjs');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const { chromium } = require('playwright');
@@ -23,7 +24,7 @@ async function main() {
       const images = new Set();
       for (let index = 1; index <= 10; index++) {
         const id = `planet-journey-${index}`;
-        await page.selectOption('#theme', id);
+        await selectSetting(page, '#theme', id);
         await page.waitForFunction(id => document.documentElement.dataset.theme === id, id);
         const rendering = await page.evaluate(() => {
           const board = document.getElementById('board');
@@ -79,11 +80,11 @@ async function main() {
       assert.equal(images.size, 10, 'Every planet layout must have distinct artwork');
       await page.reload();
       await page.waitForFunction(() => document.documentElement.dataset.theme === 'planet-journey-10');
-      await page.selectOption('#theme', 'java-atlas-v1');
+      await selectSetting(page, '#theme', 'java-atlas-v1');
       await page.waitForFunction(() => document.documentElement.dataset.theme === 'java-atlas-v1');
       assert.equal(await page.locator('.hud .icon canvas').count(), 0);
       assert.equal(await page.evaluate(() => document.getElementById('board').getContext('2d').imageSmoothingEnabled), false);
-      await page.selectOption('#theme', 'planet-journey-3');
+      await selectSetting(page, '#theme', 'planet-journey-3');
       await page.waitForFunction(() => document.documentElement.dataset.theme === 'planet-journey-3');
       await page.waitForTimeout(150);
       assert.equal(await page.locator('html').getAttribute('data-theme'), 'planet-journey-3');
