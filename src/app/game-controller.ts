@@ -316,8 +316,6 @@ export async function startGame(): Promise<void> {
   window.visualViewport?.addEventListener('resize', scheduleResize);
   document.addEventListener('fullscreenchange', () => { clearInput(); scheduleResize(); });
   // Query URLs work on GitHub Pages and keep the live session when navigating.
-  const inputSettings = document.querySelector('.input-settings');
-  if (inputSettings) element('game-settings').append(inputSettings);
   function showPage(): void {
     const requested = new URL(location.href).searchParams.get('page');
     currentPage = requested && ['settings', 'about', 'objects'].includes(requested) ? requested : 'game';

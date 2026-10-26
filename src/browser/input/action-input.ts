@@ -116,7 +116,7 @@ export function attachInput(input: ActionInput, options: {
   }
   const zone = document.createElement('input'); zone.type = 'range'; zone.min = '10'; zone.max = '80'; zone.value = '25'; zone.setAttribute('aria-label', 'Gamepad dead zone');
   zone.addEventListener('input', () => { input.deadzone = Number(zone.value) / 100; input.release('pad:'); });
-  const label = document.createElement('label'); label.textContent = 'Gamepad dead zone '; label.append(zone); panel.append(label, status); document.querySelector('main')?.append(panel);
+  const label = document.createElement('label'); label.textContent = 'Gamepad dead zone '; label.append(zone); panel.append(label, status); document.getElementById('game-settings')?.append(panel);
   return () => {
     const pad = [...(navigator.getGamepads?.() ?? [])].find(p => p?.connected && p.mapping === 'standard') ?? null;
     const edges = input.gamepad(pad);

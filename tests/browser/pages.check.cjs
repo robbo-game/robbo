@@ -14,6 +14,8 @@ const { chromium } = require('playwright');
       assert(await page.locator('#board').isVisible());
       assert(!await page.locator('#game-settings').isVisible());
       assert(!await page.locator('.input-settings').isVisible());
+      assert.equal(await page.locator('#game-settings .input-settings').count(), 1);
+      assert.equal(await page.locator('main > .input-settings').count(), 0);
       assert(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight));
       const robot=await page.locator('#board').getAttribute('data-robot');
       await page.locator('#settings').click();
