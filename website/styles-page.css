@@ -138,3 +138,13 @@ html[data-touch-fire-side="left"] .touch-gesture { order: 2; }
 #back-to-game { display: block; margin-bottom: 16px; }
 .touch-preference { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 12px 0; }
 .touch-preference select { margin-left: 0; min-width: 0; }
+
+/* Only the selected page participates in layout, including the flex play area. */
+[hidden] { display: none !important; }
+body[data-page="game"] { overflow: hidden; }
+.subpage { max-width: 780px; margin: 0 auto; padding: 24px 18px; line-height: 1.7; }
+.page-navigation { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+a { color: #caff45; }
+.toolbar a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 10px; font-size: 12px; }
+a:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
+.subpage h1, .subpage h2 { overflow-wrap: anywhere; }

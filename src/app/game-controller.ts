@@ -281,13 +281,14 @@ export async function startGame(): Promise<void> {
   element('enable-sound').addEventListener('click', activateAudio);
   element<HTMLInputElement>('mute').addEventListener('change', event => { const muted = (event.target as HTMLInputElement).checked; audio.setMuted(muted); preferences.apply({ muted }); });
   element<HTMLInputElement>('volume').addEventListener('input', event => { const volume = Number((event.target as HTMLInputElement).value) / 100; audio.setVolume(volume); preferences.apply({ volume }); });
+  let currentPage = 'game';
   const inputOptions = {
     facing: () => session.world.robot.direction,
     command: inputCommand,
-    active: () => !replay.viewing && !session.paused && !effects.holdingArrival && session.world.status === 'playing',
-    start: () => { if (!session.started) { session.start(); effects.arrive(session.world); render(); activateAudio(); } },
-    pause: pauseOrResume,
-    retry: () => { retryWithPresentation(); render(); activateAudio(); }
+    active: () => currentPage === 'game' && !replay.viewing && !session.paused && !effects.holdingArrival && session.world.status === 'playing',
+    start: () => { if (currentPage !== 'game') return; if (!session.started) { session.start(); effects.arrive(session.world); render(); activateAudio(); } },
+    pause: () => { if (currentPage === 'game') pauseOrResume(); },
+    retry: () => { if (currentPage !== 'game') return; retryWithPresentation(); render(); activateAudio(); }
   };
   const pollInput = attachInput(input, inputOptions);
   touchControls = attachTouch(input, inputOptions);
@@ -314,16 +315,39 @@ export async function startGame(): Promise<void> {
   addEventListener('orientationchange', () => { clearInput(); scheduleResize(); });
   window.visualViewport?.addEventListener('resize', scheduleResize);
   document.addEventListener('fullscreenchange', () => { clearInput(); scheduleResize(); });
-  element('settings').addEventListener('click', async () => {
-    try {
+  // Query URLs work on GitHub Pages and keep the live session when navigating.
+  const inputSettings = document.querySelector('.input-settings');
+  if (inputSettings) element('game-settings').append(inputSettings);
+  function showPage(): void {
+    const requested = new URL(location.href).searchParams.get('page');
+    currentPage = requested && ['settings', 'about', 'objects'].includes(requested) ? requested : 'game';
+    if (currentPage !== 'game') pauseInBackground();
+    element('play-area').hidden = currentPage !== 'game';
+    for (const page of document.querySelectorAll<HTMLElement>('.subpage[data-page]')) page.hidden = page.dataset.page !== currentPage;
+    document.body.dataset.page = currentPage;
+    window.scrollTo(0, 0);
+    scheduleResize();
+    if (currentPage === 'game') canvas.focus({ preventScroll: true });
+    else {
+      const heading = document.querySelector<HTMLElement>('.subpage[data-page="' + currentPage + '"] h1, .subpage[data-page="' + currentPage + '"] h2');
+      heading?.setAttribute('tabindex', '-1');
+      heading?.focus({ preventScroll: true });
+    }
+  }
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-page-link]')) {
+    link.addEventListener('click', async event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      event.preventDefault();
       if (document.fullscreenElement) await document.exitFullscreen();
-      element('game-settings').scrollIntoView();
-    } catch { element('display-status').textContent = text('fullscreen.failed'); }
-  });
-  element('back-to-game').addEventListener('click', () => {
-    element('play-area').scrollIntoView();
-    canvas.focus({ preventScroll: true });
-  });
+      const url = new URL(location.href);
+      if (link.dataset.pageLink === 'game') url.searchParams.delete('page');
+      else url.searchParams.set('page', link.dataset.pageLink!);
+      history.pushState(null, '', url);
+      showPage();
+    });
+  }
+  addEventListener('popstate', showPage);
+  showPage();
   canvas.addEventListener('pointerdown', () => canvas.focus({ preventScroll: true }));
   element('fullscreen').addEventListener('click', async () => {
     try {
