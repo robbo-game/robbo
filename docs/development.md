@@ -124,7 +124,7 @@ is the lifecycle checkpoint used when a mobile page becomes hidden.
 
 ## GitHub Pages and PR previews
 
-The production game stays at `https://sigmalko.github.io/robbo/`. Each successful
+The production game stays at `https://robbo-game.github.io/robbo/`. Each successful
 same-repository PR build is available at `/robbo/previews/pr-N/`; the comparison
 index is `/robbo/previews/`. Preview navigation links back to main and the index.
 `version.json` in each slot identifies its built commit and PR.

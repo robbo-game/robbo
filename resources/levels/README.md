@@ -9,7 +9,7 @@ These are the unchanged historical map files, relocated from `legacy/RobboNormal
 | `robbo01.dat` | `8cde5070e81184bb664a25a25922b24d47fb2f5ef957b3ff4d91b676b7957fb8` |
 | `robbo02.dat` | `fe6461631f7e8e7b214e841af53b0c5f9d043731ae502125e1e80a8d5957813f` |
 
-The original files remain available in [the merged implementation commit](https://github.com/sigmalko/robbo/tree/c8528cd/legacy/RobboNormal/src/robbo/world/levels).
+The original files remain available in [the merged implementation commit](https://github.com/robbo-game/robbo/tree/c8528cd/legacy/RobboNormal/src/robbo/world/levels).
 
 ## Unvalidated candidate
 
