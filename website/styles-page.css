@@ -28,8 +28,6 @@ canvas { position: absolute; inset: 0; touch-action: none; }
 #milestone-notice strong { display: block; font: 800 clamp(13px, 2.5vw, 19px)/1.3 ui-monospace, monospace; letter-spacing: .1em; }
 #milestone-notice span { display: block; margin-top: 5px; font-size: 12px; color: #eceddc; }
 #milestone-notice[data-kind="departure"] { border-color: #a9e7ff99; color: #d2f3ff; box-shadow: 0 0 30px #72dfff22; }
-.hud > .screws-secured { background: #ffe09912; border-radius: 5px; box-shadow: inset 0 2px #ffe099; }
-.hud > .screws-secured .hud-label { color: #ffe6a8; }
 #overlay { z-index: 2; }
 @media (max-height: 420px) { #milestone-notice { top: 6px; padding: 6px 12px; } #milestone-notice span { font-size: 10px; margin-top: 2px; } }
 .hud { padding: 8px; background: #080b08; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }

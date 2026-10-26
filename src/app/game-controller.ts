@@ -178,7 +178,6 @@ export async function startGame(): Promise<void> {
     const milestoneHelp = effect?.kind === 'unlock' ? text('milestone.ready') : effect?.kind === 'departure' ? session.planet === session.pack.levels.length ? text('state.final') : text('milestone.destination', { planet: session.planet + 1 }) : text('ui.intro');
     if (element('milestone-title').textContent !== milestoneTitle) element('milestone-title').textContent = milestoneTitle;
     if (element('milestone-help').textContent !== milestoneHelp) element('milestone-help').textContent = milestoneHelp;
-    element('remaining').closest('.hud > div')!.classList.toggle('screws-secured', world.remaining === 0 && session.started);
   }
   function drawBoard(view = renderer.resize(session.world)): void {
     const interpolation = manualTicks || session.paused ? 0 : Math.min(100, Math.max(0, performance.now() - lastPresentationTick));
