@@ -12,7 +12,7 @@
     <div id="play-area">
     <div class="toolbar">
       <button id="start" data-text="ui.start.game">Start game</button><button id="restart" data-text="ui.restart.planet">Reset planet</button><button id="pause" data-text="ui.pause"><span data-text="ui.pause.label">Pause</span></button><button id="fullscreen" data-text="ui.fullscreen">Fullscreen</button>
-      <button id="settings">Settings</button>
+      <a id="settings" href="?page=settings" data-page-link="settings">Settings</a><a href="?page=about" data-page-link="about">About the game</a><a href="?page=objects" data-page-link="objects">Objects and hazards</a>
     </div>
     <p id="display-status" role="status"></p>
     <section class="game" aria-label="Robbo game" data-label="label.robbo.game">
@@ -29,9 +29,9 @@
       </div>
     </section>
     </div>
-    <section id="game-settings" aria-label="Game settings">
-    <header><div><p id="campaign-intro" class="eyebrow" data-text="ui.a.journey.through.56.planets">A journey through 56 planets</p><h1 data-text="ui.robbo">ROBBO</h1></div><p class="intro"><span data-text="ui.intro">Find the screws. Reach the ship.</span><br><span data-text="ui.watch.your.step">Watch your step.</span></p></header>
-    <button id="back-to-game">Back to game</button>
+    <section id="game-settings" class="subpage" data-page="settings" aria-label="Game settings" hidden>
+    <h1>Settings</h1>
+    <nav class="page-navigation" aria-label="Page navigation"><a id="back-to-game" href="?" data-page-link="game">Back to game</a><a href="?page=about" data-page-link="about">About the game</a><a href="?page=objects" data-page-link="objects">Objects and hazards</a></nav>
     <label class="touch-preference">Touch movement <select id="touch-movement" aria-describedby="touch-movement-help"><option value="dpad">D-pad buttons</option><option value="gestures">Swipe gestures</option></select></label>
     <label class="touch-preference">Touch layout <select id="touch-fire-side"><option value="right">FIRE right · movement left</option><option value="left">FIRE left · movement right</option></select></label>
     <p id="touch-movement-help"></p><p>Tap FIRE once per shot; holding never repeats. Hold AIM and choose a direction to turn without moving or spending ammunition. Hold FIRE and choose a direction to turn without another shot. Release the direction first to stop in place. Keyboard: Shift + arrow to aim, Ctrl + arrow to fire once. Gamepad: B to aim, A to fire once. Control changes are saved automatically and keep your current game.</p>
@@ -45,10 +45,12 @@
     <p id="audio-status" role="status"></p>
     <p id="exit-status" role="status" aria-live="polite"></p>
     <p class="controls"><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> <span data-text="ui.move.label">Move &nbsp;</span> <kbd data-text="ui.ctrl">Ctrl</kbd> <span data-text="ui.fire.label">+ arrow Fire &nbsp;</span> <kbd data-text="ui.r">R</kbd> <span data-text="ui.retry.label">Retry &nbsp;</span> <kbd data-text="ui.p">P</kbd> <span data-text="ui.pause.label">Pause</span></p>
-    <details><summary data-text="ui.how.to.play">How to play</summary><p data-text="help.overview.inventory">Pick up ammunition for 9 shots. Keys open one door each; enter it on your next step. Push boxes, bombs, question boxes and an inactive ship into free space. Shoot sand to clear a path. A question box reveals a random object after it is shot.</p><p data-text="help.overview.hazards">Enemies, bullets, flames, lasers, rivers and magnets can kill Robbo. Mirrors teleport between linked destinations. Bombs trigger nearby bombs. A destroyed required screw or ship can make a planet impossible to finish: press R to retry. Retries are unlimited.</p><p data-text="help.overview.campaigns">The planet selector lets you revisit any stage. Each campaign contains the same 56 planets with a few historical layout differences; inventories reset between planets.</p></details>
-    <section aria-labelledby="object-help-title"><h2 id="object-help-title" data-text="help.title"></h2><div id="object-help"></div></section>
+
+
     <footer data-text="ui.credits">Original levels by Janusz Pelc · Java legacy mechanics restored in TypeScript</footer>
     </section>
+    <article class="subpage" data-page="about" hidden><nav class="page-navigation" aria-label="Page navigation"><a href="?" data-page-link="game">Back to game</a><a href="?page=settings" data-page-link="settings">Settings</a><a href="?page=about" data-page-link="about">About the game</a><a href="?page=objects" data-page-link="objects">Objects and hazards</a></nav>    <header><div><p id="campaign-intro" class="eyebrow" data-text="ui.a.journey.through.56.planets">A journey through 56 planets</p><h1 data-text="ui.robbo">ROBBO</h1></div><p class="intro"><span data-text="ui.intro">Find the screws. Reach the ship.</span><br><span data-text="ui.watch.your.step">Watch your step.</span></p></header>    <section><h2 data-text="ui.how.to.play">How to play</h2><p data-text="help.overview.inventory">Pick up ammunition for 9 shots. Keys open one door each; enter it on your next step. Push boxes, bombs, question boxes and an inactive ship into free space. Shoot sand to clear a path. A question box reveals a random object after it is shot.</p><p data-text="help.overview.hazards">Enemies, bullets, flames, lasers, rivers and magnets can kill Robbo. Mirrors teleport between linked destinations. Bombs trigger nearby bombs. A destroyed required screw or ship can make a planet impossible to finish: press R to retry. Retries are unlimited.</p><p data-text="help.overview.campaigns">The planet selector lets you revisit any stage. Each campaign contains the same 56 planets with a few historical layout differences; inventories reset between planets.</p></section></article>
+    <article class="subpage" data-page="objects" hidden><nav class="page-navigation" aria-label="Page navigation"><a href="?" data-page-link="game">Back to game</a><a href="?page=settings" data-page-link="settings">Settings</a><a href="?page=about" data-page-link="about">About the game</a><a href="?page=objects" data-page-link="objects">Objects and hazards</a></nav>    <section aria-labelledby="object-help-title"><h2 id="object-help-title" data-text="help.title"></h2><div id="object-help"></div></section></article>
   </main>
 </body>
 </html>
