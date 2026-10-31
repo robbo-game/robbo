@@ -261,7 +261,7 @@ export class GameWorld {
   }
   private bounce(e: Entity): void {
     const [x, y] = this.next(e, e.direction); const target = this.at(x, y);
-    if (target?.kind === 'robot') { this.killRobot(); return; }
+    if (target?.kind === 'robot' && e.kind !== 'cannon') { this.killRobot(); return; }
     if (!this.move(e, x, y)) e.direction = inverse(e.direction);
   }
   private wallFollow(e: Entity): void {

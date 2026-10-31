@@ -1,8 +1,39 @@
 import { describe, it, expect } from 'vitest';
 import { world, steps } from '../fixtures/world';
 import type { Direction } from '../../src/engine/model';
+import { GameWorld } from '../../src/engine/game-world';
+import { packs } from '../../src/generated/packs';
 
 describe('Cannon options and weapons', () => {
+  it.each(packs)('lets Robbo push the box beside the moving cannon on planet 45 in pack $id', pack => {
+    const w = new GameWorld(pack.levels[44], () => 0.5);
+    const cannon = w.at(9, 12);
+    for (const e of w.entities.values()) if (e.kind === 'cannon') e.countdown = 100;
+    expect(w.move(w.robot, 8, 13)).toBe(true);
+    w.command(3); steps(w, 1);
+    expect(w.at(8, 11).kind).toBe('box');
+    expect(w.robot).toMatchObject({ x: 8, y: 12 });
+    expect(cannon.direction).toBe(2);
+    steps(w, 1);
+    expect(w.status).toBe('playing');
+    expect(cannon).toMatchObject({ x: 9, y: 12, direction: 0 });
+  });
+  it('bounces off Robbo without contact damage while he pushes a box', () => {
+    const w = world(['sssssss', 's.....s', 's}R#..s', 's.....s', 'sssssss'], { '1,2': [3, 0, 0, 1, 0, 0] });
+    const cannon = w.at(1, 2); cannon.countdown = 100;
+    w.command(0); steps(w, 1);
+    expect(w.status).toBe('playing');
+    expect(cannon).toMatchObject({ x: 1, y: 2, direction: 2 });
+    expect(w.robot).toMatchObject({ x: 3, y: 2, alive: true });
+    expect(w.at(4, 2).kind).toBe('box');
+    expect(w.events.some(e => e.type === 'kill')).toBe(false);
+  });
+  it('still kills Robbo when a moving cannon fires directly at him', () => {
+    const w = world(['sssss', 's}R.s', 'sssss'], { '1,1': [0, 0, 0, 1, 0, 0] });
+    w.at(1, 1).countdown = 0;
+    steps(w, 1);
+    expect(w.status).toBe('dead');
+  });
   it('decodes all six options and applies the Java continuous-fire restrictions', () => {
     const w = world(['ssssssssss', 'sR.......s', 's.}..}...s', 's........s', 'ssssssssss'], { '2,2': [3, 2, 1, 1, 0, 0], '5,2': [1, 0, 1, 1, 1, 1] });
     expect(w.at(2, 2)).toMatchObject({ fireDirection: 3, direction: 2, fireType: 0, moving: true });
