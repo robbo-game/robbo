@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title data-text="ui.robbo.56.planets">Robbo — 56 planets</title>
-  <link rel="stylesheet" href="styles-page.css">
+  <link rel="stylesheet" href="styles-page.css?v=20261031-mobile-toolbar">
   <script defer src="dist/robbo.js"></script>
 </head>
 <body>
   <main>
     <div id="play-area">
-    <div class="toolbar">
+    <nav class="toolbar" aria-label="Game controls and navigation">
       <button id="start" data-text="ui.start.game">Start game</button><button id="restart" data-text="ui.restart.planet">Reset planet</button><button id="pause" data-text="ui.pause"><span data-text="ui.pause.label">Pause</span></button><button id="fullscreen" data-text="ui.fullscreen">Fullscreen</button>
       <a id="settings" href="?page=settings" data-page-link="settings">Settings</a><a href="?page=about" data-page-link="about">About the game</a><a href="?page=objects" data-page-link="objects">Objects and hazards</a>
-    </div>
+    </nav>
     <p id="display-status" role="status"></p>
     <section class="game" aria-label="Robbo game" data-label="label.robbo.game">
       <div class="viewport">

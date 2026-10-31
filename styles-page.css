@@ -148,7 +148,25 @@ a { color: #caff45; }
 .toolbar a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 10px; font-size: 12px; }
 a:focus-visible { outline: 2px solid #caff45; outline-offset: 3px; }
 .subpage h1, .subpage h2 { overflow-wrap: anywhere; }
+
+/* Navigation shares the game's button palette and spacing. */
+.toolbar { gap: 6px; padding: 6px; background: #172016; border-bottom: 1px solid #364330; }
+.toolbar a, .page-navigation a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 11px; border: 1px solid #506344; border-radius: 5px; background: #253222; color: #e3ebd5; font: inherit; font-size: 13px; line-height: normal; text-decoration: none; text-align: center; }
+.toolbar a:hover, .page-navigation a:hover { background: #3b4c30; border-color: #829d69; }
+.toolbar a:active, .page-navigation a:active { background: #506344; }
+.toolbar #settings { margin-left: auto; }
+html[data-theme="neon-forge-v1"] .toolbar { background: #07101f; border-color: #2872a8; }
+html[data-theme="neon-forge-v1"] .toolbar a, html[data-theme="neon-forge-v1"] .page-navigation a { background: #10264a; border-color: #348bc4; }
+html[data-theme="neon-forge-v1"] .toolbar a:hover, html[data-theme="neon-forge-v1"] .page-navigation a:hover { background: #193b6f; }
+@media (max-width: 600px), (max-height: 500px) {
+  .toolbar { gap: 4px; padding: 4px; }
+  .toolbar a { padding: 6px; font-size: 12px; flex: 1 1 auto; }
+  .toolbar #settings { margin-left: 0; }
+}
+@media (pointer: coarse) { .toolbar a { min-height: 48px; } }
+/* Keep the six touch navigation controls in two rows on narrow phones. */
 @media (pointer: coarse) and (max-width: 340px) {
-  .toolbar { gap: 2px; padding: 2px; }
+  .toolbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
   .toolbar a { padding: 4px; font-size: 11px; }
+  .touch-controls { padding: 8px; }
 }
